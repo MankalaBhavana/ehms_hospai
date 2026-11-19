@@ -446,6 +446,31 @@ def hr_leave_status_update(leave_id):
     )
     if not updated:
         return jsonify({"error": "Leave request not found"}), 404
+
+    # Doctor availability hook: notify if approved leave affects doctor schedule
+    new_status = (payload.get("status") or "").strip().lower()
+    if new_status == "approved":
+        try:
+            from services.doctor_availability_service import (
+                get_doctor_record,
+                notify_leave_affects_schedule,
+            )
+            from utils.database import get_connection
+            with get_connection() as conn:
+                cur = conn.cursor()
+                cur.execute("SELECT * FROM leave_requests WHERE id = ?", (leave_id,))
+                lr = cur.fetchone()
+                if lr:
+                    lr_dict = dict(lr)
+                    doc = get_doctor_record(lr_dict.get("employee_id"), hospital_id=current_hospital_id())
+                    if doc:
+                        notify_leave_affects_schedule(
+                            doc["doctor_name"],
+                            lr_dict,
+                            hospital_id=current_hospital_id(),
+                        )
+        except Exception:
+            pass
     log_audit_event(
         "update", "leave_requests", str(leave_id), {"status": payload.get("status")}
     )

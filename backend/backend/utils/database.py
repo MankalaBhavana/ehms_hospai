@@ -523,6 +523,7 @@ def init_database():
         ensure_bed_billing_columns(conn)
         ensure_op_tables(conn)
         ensure_admin_tables(conn)
+        ensure_doctor_availability_tables(conn)
 
         # General ledger (billing-service's accounts module). Imported here, not at
         # module top, so utils.database keeps no import-time dependency on modules/.
@@ -4587,6 +4588,31 @@ def create_appointment(data, hospital_id=None):
         # 2. Create Encounter if OP
         visit_type = data.get("visit_type", "OP")
         doctor_name = data.get("doctor_name")
+        target_dept = data.get("department") or "General Medicine"
+
+        # Check doctor eligibility if appointment is on today's hospital date
+        today_str = current_ist_datetime().strftime("%Y-%m-%d")
+        if doctor_name and appointment_day == today_str:
+            try:
+                from services.doctor_availability_service import (
+                    is_doctor_eligible_for_assignment,
+                    notify_no_doctor_available,
+                )
+                is_ok, reason, doc_details = is_doctor_eligible_for_assignment(
+                    doctor_name, department=target_dept, hospital_id=scoped_hospital_id
+                )
+                if is_ok and doc_details:
+                    doctor_name = doc_details["doctor_name"]
+                else:
+                    doctor_name = None
+                    notify_no_doctor_available(
+                        target_dept,
+                        {"patient_id": resolved_patient_id, "name": patient_name},
+                        hospital_id=scoped_hospital_id,
+                    )
+            except Exception:
+                pass
+
         initial_status = data.get("status") or ("checked_in" if doctor_name else "scheduled")
         op_status = "doctor_assigned" if doctor_name else "queued"
         chief_complaint = data.get("chief_complaint") or data.get("notes") or ""
@@ -4750,10 +4776,16 @@ def check_patient_match(term, hospital_id=None):
 
 
 def get_eligible_op_doctors(department=None, patient_gender=None, doctor_gender_preference=None, hospital_id=None):
-    """Implement gender-matching and availability rule for OP doctor assignment.
-    Male Patient -> Male Doctor of Required Specialty
-    Female Patient -> Female Doctor of Required Specialty
-    Fallback to other available doctor of same specialty if none available."""
+    """Implement centralized availability and workload-balancing rule for OP doctor assignment.
+    Verifies:
+    1. Active account
+    2. Active login session
+    3. Official scheduled duty covering current hospital date & time
+    4. Not on approved leave
+    5. Not marked unavailable
+    6. Department / specialty match
+    7. Workload strictly below configured capacity
+    """
     scoped_hospital_id = hospital_id or resolve_hospital_id()
     today = current_ist_datetime().strftime("%Y-%m-%d")
 
@@ -4761,38 +4793,32 @@ def get_eligible_op_doctors(department=None, patient_gender=None, doctor_gender_
     if desired_gender not in ("Male", "Female"):
         desired_gender = None
 
+    from services.doctor_availability_service import get_doctor_availability
+
     with get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT id, doctor_name, department, gender, consultation_fee, review_fee, status FROM doctors ORDER BY doctor_name ASC")
+        cursor.execute("SELECT id, doctor_name, department, gender, consultation_fee, review_fee, status FROM doctors WHERE (hospital_id = ? OR hospital_id IS NULL) ORDER BY doctor_name ASC", (scoped_hospital_id,))
         doc_rows = cursor.fetchall()
-
-        cursor.execute(
-            """
-            SELECT doctor_name, COUNT(*) as count
-            FROM appointments
-            WHERE hospital_id = ? AND visit_type = 'OP' AND DATE(appointment_date) = DATE(?)
-              AND status IN ('scheduled', 'checked_in', 'in_consultation')
-            GROUP BY doctor_name
-            """,
-            (scoped_hospital_id, today),
-        )
-        workload_map = {row["doctor_name"]: row["count"] for row in cursor.fetchall()}
 
         doctors_list = []
         for d in doc_rows:
             d_name = d["doctor_name"]
             d_dept = d["department"] or "General"
             d_gender = d["gender"] or "Male"
-            d_status = (d["status"] or "available").lower()
-            workload = workload_map.get(d_name, 0)
+
+            # Centralized availability check
+            avail = get_doctor_availability(d["id"], hospital_id=scoped_hospital_id)
+            is_available = bool(avail and avail.get("is_eligible"))
+            real_status = avail["status"] if avail else (d["status"] or "available").lower()
+            workload = avail["current_workload"] if avail else 0
+            max_capacity = avail["max_workload"] if avail else 15
 
             dept_matches = True
-            if department and department.strip():
+            if department and department.strip() and department.lower() != "all":
                 req_dept = department.strip().lower()
                 dept_matches = req_dept in d_dept.lower() or d_dept.lower() in req_dept
 
             gender_matches = (desired_gender is None) or (d_gender.lower() == desired_gender.lower())
-            is_available = (d_status == "available")
 
             score = 0
             if dept_matches:
@@ -4800,7 +4826,7 @@ def get_eligible_op_doctors(department=None, patient_gender=None, doctor_gender_
             if gender_matches:
                 score += 50
             if is_available:
-                score += 30
+                score += 50
             score += max(0, 20 - workload)
 
             doctors_list.append({
@@ -4810,36 +4836,42 @@ def get_eligible_op_doctors(department=None, patient_gender=None, doctor_gender_
                 "gender": d_gender,
                 "consultation_fee": d["consultation_fee"] or 0,
                 "review_fee": d["review_fee"] or 0,
-                "status": d_status,
+                "status": real_status,
+                "status_label": avail.get("status_label") if avail else real_status,
                 "current_workload": workload,
+                "max_workload": max_capacity,
                 "department_matches": dept_matches,
                 "gender_matches": gender_matches,
                 "is_available": is_available,
                 "match_score": score,
             })
 
-        doctors_list.sort(key=lambda x: (-x["match_score"], -int(x["department_matches"]), -int(x["gender_matches"]), x["current_workload"]))
+        doctors_list.sort(key=lambda x: (-int(x["is_available"]), -int(x["department_matches"]), -x["match_score"], x["current_workload"]))
 
         recommended = None
-        # 1. Department match + Gender match + Available
+        # 1. Available + Department match + Gender match
         for doc in doctors_list:
-            if doc["department_matches"] and doc["gender_matches"] and doc["is_available"]:
+            if doc["is_available"] and doc["department_matches"] and doc["gender_matches"]:
                 recommended = doc
                 break
-        # 2. If primary doctor is unavailable/busy, fallback to another available doctor of SAME gender
+        # 2. Available + Department match
         if not recommended:
             for doc in doctors_list:
-                if doc["gender_matches"] and doc["is_available"]:
+                if doc["is_available"] and doc["department_matches"]:
                     recommended = doc
                     break
-        # 3. Department match + Available
+        # 3. Available + Same gender (any specialty if emergency fallback)
         if not recommended:
             for doc in doctors_list:
-                if doc["department_matches"] and doc["is_available"]:
+                if doc["is_available"] and doc["gender_matches"]:
                     recommended = doc
                     break
-        if not recommended and doctors_list:
-            recommended = doctors_list[0]
+        # 4. Any available doctor
+        if not recommended:
+            for doc in doctors_list:
+                if doc["is_available"]:
+                    recommended = doc
+                    break
 
         recommendation_action = "assign" if (recommended and recommended["is_available"]) else "queue"
 
@@ -4993,9 +5025,48 @@ def register_op_visit(patient_data=None, patient_id=None, appointment_data=None,
         )
         token_no = int((cursor.fetchone() or {"value": 0})["value"] or 0) + 1
 
-        doctor_name = appointment_data.get("doctor_name")
-        initial_status = appointment_data.get("status") or ("checked_in" if doctor_name else "scheduled")
+        requested_doc = appointment_data.get("doctor_name")
+        target_dept = appointment_data.get("department") or "General Medicine"
+        doctor_name = None
+
+        from services.doctor_availability_service import (
+            is_doctor_eligible_for_assignment,
+            get_eligible_doctors_for_department,
+            notify_no_doctor_available,
+        )
+
+        if requested_doc and requested_doc.strip():
+            is_ok, reason, doc_details = is_doctor_eligible_for_assignment(
+                requested_doc, department=target_dept, hospital_id=scoped_hospital_id
+            )
+            if is_ok and doc_details:
+                doctor_name = doc_details["doctor_name"]
+            else:
+                eligible = get_eligible_doctors_for_department(
+                    department=target_dept,
+                    hospital_id=scoped_hospital_id,
+                    doctor_gender_preference=appointment_data.get("gender_preference") or patient_gender,
+                )
+                if eligible:
+                    doctor_name = eligible[0]["doctor_name"]
+        else:
+            eligible = get_eligible_doctors_for_department(
+                department=target_dept,
+                hospital_id=scoped_hospital_id,
+                doctor_gender_preference=appointment_data.get("gender_preference") or patient_gender,
+            )
+            if eligible:
+                doctor_name = eligible[0]["doctor_name"]
+
+        initial_status = "checked_in" if doctor_name else "scheduled"
         op_status = "doctor_assigned" if doctor_name else "queued"
+
+        if not doctor_name:
+            notify_no_doctor_available(
+                department=target_dept,
+                patient_info={"patient_id": resolved_patient_id, "name": patient_name},
+                hospital_id=scoped_hospital_id,
+            )
 
         chief_complaint = appointment_data.get("chief_complaint") or appointment_data.get("notes") or ""
         symptoms = appointment_data.get("symptoms") or ""
@@ -5368,6 +5439,8 @@ def add_op_vitals(appointment_id, data, hospital_id=None, actor=None):
 
 def assign_op_doctor(appointment_id, doctor_name, hospital_id=None, actor=None):
     scoped_hospital_id = hospital_id or resolve_hospital_id()
+    from services.doctor_availability_service import is_doctor_eligible_for_assignment
+
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM appointments WHERE id = ? AND hospital_id = ? FOR UPDATE", (appointment_id, scoped_hospital_id))
@@ -5375,14 +5448,15 @@ def assign_op_doctor(appointment_id, doctor_name, hospital_id=None, actor=None):
         if not appointment:
             return "not_found"
 
-        cursor.execute("SELECT doctor_name, department, status, gender FROM doctors WHERE LOWER(doctor_name) = LOWER(?)", (doctor_name.strip(),))
-        doctor = cursor.fetchone()
-        if not doctor:
-            cursor.execute("SELECT full_name as doctor_name, department, status FROM users WHERE hospital_id = ? AND job_role = 'Doctor' AND LOWER(full_name) = LOWER(?)", (scoped_hospital_id, doctor_name.strip()))
-            doctor = cursor.fetchone()
+        target_dept = appointment.get("department") or "General Medicine"
+        is_ok, reason, doc_details = is_doctor_eligible_for_assignment(
+            doctor_name, department=target_dept, hospital_id=scoped_hospital_id
+        )
+        if not is_ok or not doc_details:
+            return reason or "Doctor is currently unavailable for assignments"
 
-        if not doctor:
-            return "unavailable"
+        final_doctor_name = doc_details["doctor_name"]
+        final_dept = doc_details.get("department") or target_dept
 
         cursor.execute(
             """
@@ -5390,12 +5464,12 @@ def assign_op_doctor(appointment_id, doctor_name, hospital_id=None, actor=None):
             SET doctor_name = ?, department = COALESCE(?, department), status = 'checked_in', op_status = 'doctor_assigned'
             WHERE id = ? AND hospital_id = ?
             """,
-            (doctor["doctor_name"], doctor.get("department"), appointment_id, scoped_hospital_id),
+            (final_doctor_name, final_dept, appointment_id, scoped_hospital_id),
         )
 
         record_op_timeline_event(
             appointment_id, "Doctor Assigned",
-            f"Patient assigned to {doctor['doctor_name']} ({doctor.get('department') or 'General'})",
+            f"Patient assigned to Dr. {final_doctor_name} ({final_dept})",
             actor=actor, hospital_id=scoped_hospital_id
         )
 
@@ -9186,45 +9260,41 @@ def add_er_treatment(hospital_id, er_visit_id, data):
 
 
 def assign_er_doctor(hospital_id, er_visit_id, specialty, doctor_name=None):
-    """Suggests a doctor via the same deterministic matching Symptom AI triage
-    uses when no doctor_name is given explicitly; staff can always override
-    with an explicit doctor_name. Never decides on its own who treats the
-    patient -- only fills in a suggestion for staff to confirm.
+    """Assigns or suggests a doctor for ER visit using centralized real-time eligibility.
+    Ensures assigned doctor is active, logged in, on duty, and not on leave.
+    If nobody in the exact specialty is available, falls back to an available covering physician.
+    """
+    from services.doctor_availability_service import (
+        is_doctor_eligible_for_assignment,
+        get_eligible_doctors_for_department,
+    )
 
-    If nobody in the exact requested specialty is on staff, falls back to any
-    other available doctor (real ER practice: the on-call/general physician
-    covers until a specialist is free) instead of leaving the visit
-    unassigned. get_suggested_doctors() already does this same
-    exact-department-first-else-anyone fallback internally, but a naive
-    match_doctor_to_department() re-filter on its result would silently
-    throw that fallback away again whenever the exact department has no
-    doctor -- so the fallback candidate is taken directly here instead."""
     final_doctor = (doctor_name or "").strip()
     matched_specialty = specialty
     used_fallback = False
+
+    if final_doctor:
+        is_ok, reason, doc_details = is_doctor_eligible_for_assignment(
+            final_doctor, hospital_id=hospital_id
+        )
+        if not is_ok or not doc_details:
+            final_doctor = ""
+
     if not final_doctor:
-        candidates = get_suggested_doctors(department=specialty, hospital_id=hospital_id)
-        available = [
-            f"{doc['doctor_name']} ({doc.get('department') or ''})"
-            for doc in candidates
-            if doc.get("doctor_name")
-        ]
-        final_doctor = match_doctor_to_department(available, specialty)
-        if not final_doctor and candidates:
-            top = candidates[0]
-            final_doctor = (top.get("doctor_name") or "").strip()
-            matched_specialty = top.get("department") or specialty
-            used_fallback = bool(final_doctor)
+        candidates = get_eligible_doctors_for_department(specialty, hospital_id=hospital_id)
+        if candidates:
+            final_doctor = candidates[0]["doctor_name"]
+            matched_specialty = candidates[0]["department"]
+        else:
+            fallback_candidates = get_eligible_doctors_for_department(None, hospital_id=hospital_id)
+            if fallback_candidates:
+                top = fallback_candidates[0]
+                final_doctor = top["doctor_name"]
+                matched_specialty = top["department"]
+                used_fallback = True
 
     with get_connection() as conn:
         cursor = conn.cursor()
-        # matched_specialty, not specialty -- on a fallback match it holds the
-        # covering doctor's REAL department, while `specialty` is still the
-        # originally requested one. Storing `specialty` here was writing e.g.
-        # "Cardiology" (what was asked for) even though the doctor actually
-        # assigned practices General Medicine (the fallback that was found) --
-        # the accept toast and printed handover sheet would then show a
-        # doctor next to a specialty they don't actually belong to.
         cursor.execute(
             "UPDATE er_visits SET assigned_doctor_name = ?, assigned_specialty = ?, "
             "doctor_assigned_at = CURRENT_TIMESTAMP, doctor_accepted_at = NULL "
@@ -12662,6 +12732,80 @@ def ensure_admin_tables(conn):
             UNIQUE(hospital_id, channel)
         )
     """)
+    conn.commit()
+
+
+def ensure_doctor_availability_tables(conn):
+    """Ensure schema tables, columns, and indexes for Centralized Doctor Availability & Assignment Engine."""
+    cursor = conn.cursor()
+    id_column = "SERIAL PRIMARY KEY"
+
+    # 1. Doctors table schema upgrades
+    _ensure_column(cursor, "doctors", "user_id", "INTEGER")
+    _ensure_column(cursor, "doctors", "max_workload", "INTEGER DEFAULT 15")
+    _ensure_column(cursor, "doctors", "is_manually_unavailable", "BOOLEAN DEFAULT FALSE")
+    _ensure_column(cursor, "doctors", "manual_unavailable_reason", "TEXT")
+    _ensure_column(cursor, "doctors", "duty_start_time", "TEXT DEFAULT '09:00'")
+    _ensure_column(cursor, "doctors", "duty_end_time", "TEXT DEFAULT '17:00'")
+    _ensure_column(cursor, "doctors", "working_days", "TEXT DEFAULT '[\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\",\"Friday\",\"Saturday\"]'")
+    _ensure_column(cursor, "doctors", "weekly_off_days", "TEXT DEFAULT '[\"Sunday\"]'")
+    _ensure_column(cursor, "doctors", "shift_name", "TEXT DEFAULT 'Morning'")
+    _ensure_column(cursor, "doctors", "schedule_active", "BOOLEAN DEFAULT TRUE")
+    _ensure_column(cursor, "doctors", "weekly_schedules", "TEXT DEFAULT '{}'")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_doctors_user_id ON doctors(user_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_doctors_manually_unavailable ON doctors(is_manually_unavailable)")
+
+    # 2. Doctor Schedules schema upgrades
+    _ensure_column(cursor, "doctor_schedules", "doctor_id", "INTEGER")
+    _ensure_column(cursor, "doctor_schedules", "hospital_id", "INTEGER")
+    _ensure_column(cursor, "doctor_schedules", "shift_type", "TEXT DEFAULT 'General'")
+    _ensure_column(cursor, "doctor_schedules", "is_overnight", "BOOLEAN DEFAULT FALSE")
+    _ensure_column(cursor, "doctor_schedules", "is_temporary_override", "BOOLEAN DEFAULT FALSE")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_doctor_schedules_hospital ON doctor_schedules(hospital_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_doctor_schedules_doc_id ON doctor_schedules(doctor_id)")
+
+    # 3. Leave Requests schema upgrades
+    _ensure_column(cursor, "leave_requests", "doctor_id", "INTEGER")
+    _ensure_column(cursor, "leave_requests", "hospital_id", "INTEGER")
+    _ensure_column(cursor, "leave_requests", "half_day", "BOOLEAN DEFAULT FALSE")
+    _ensure_column(cursor, "leave_requests", "half_day_period", "TEXT DEFAULT 'full_day'")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_leave_requests_doctor_id ON leave_requests(doctor_id)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_leave_requests_emp_dates ON leave_requests(employee_id, start_date, end_date)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON leave_requests(status)")
+
+    # 4. Doctor Availability Notifications Table
+    cursor.execute(f"""
+        CREATE TABLE IF NOT EXISTS doctor_availability_notifications (
+            id {id_column},
+            hospital_id INTEGER NOT NULL,
+            doctor_id INTEGER,
+            doctor_name TEXT,
+            department TEXT,
+            event_type TEXT NOT NULL,
+            message TEXT NOT NULL,
+            details TEXT DEFAULT '{{}}',
+            severity TEXT DEFAULT 'warning',
+            is_resolved BOOLEAN DEFAULT FALSE,
+            resolved_at TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_doc_avail_notif_hosp ON doctor_availability_notifications(hospital_id, created_at DESC)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_doc_avail_notif_resolved ON doctor_availability_notifications(is_resolved)")
+
+    # 5. Link existing doctors to users if user_id is null
+    try:
+        cursor.execute("""
+            UPDATE doctors d
+            SET user_id = u.id
+            FROM users u
+            WHERE d.user_id IS NULL
+              AND (d.staff_id = u.employee_id OR d.username = u.username OR LOWER(d.doctor_name) = LOWER(u.full_name))
+              AND (d.hospital_id = u.hospital_id OR d.hospital_id IS NULL OR u.hospital_id IS NULL)
+        """)
+    except Exception:
+        pass
+
     conn.commit()
 
 

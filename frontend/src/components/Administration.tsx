@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast"
 import { Stethoscope, Users as UsersIcon } from "lucide-react"
 import DoctorsOverview from "./doctor/DoctorsOverview"
 import DoctorPortal from "./doctor/DoctorPortal"
+import DoctorAvailabilityDashboard from "./doctor/DoctorAvailabilityDashboard"
 import { DoctorAccount, getDoctorById } from "../services/doctorPortalDb"
 import { clearAllApplicationData } from "../services/legacySeedPurge"
 import {
@@ -251,15 +252,15 @@ export default function Administration({
   initialDoctorSubTab,
   onNavigateToDoctorPortal,
 }: {
-  initialTab?: "overview" | "roles" | "users" | "doctors" | "audit" | "settings" | "tariffs" | "rates"
-  initialDoctorSubTab?: "workspace" | "directory"
+  initialTab?: "overview" | "roles" | "users" | "doctors" | "doctor_availability" | "audit" | "settings" | "tariffs" | "rates"
+  initialDoctorSubTab?: "workspace" | "directory" | "availability"
   onNavigateToDoctorPortal?: () => void
 } = {}) {
   const [activeTab, setActiveTab] =
-    useState<"overview" | "roles" | "users" | "doctors" | "audit" | "settings" | "tariffs" | "rates">(initialTab === "tariffs" ? "rates" : initialTab || "overview")
+    useState<"overview" | "roles" | "users" | "doctors" | "doctor_availability" | "audit" | "settings" | "tariffs" | "rates">(initialTab === "tariffs" ? "rates" : initialTab || "overview")
 
-  const [doctorSubTab, setDoctorSubTab] = useState<"workspace" | "directory">(
-    initialDoctorSubTab || "workspace"
+  const [doctorSubTab, setDoctorSubTab] = useState<"workspace" | "directory" | "availability">(
+    initialDoctorSubTab || "availability"
   )
   const [adminInspectingDoctor, setAdminInspectingDoctor] = useState<DoctorAccount | null>(null)
 
@@ -2021,6 +2022,10 @@ export default function Administration({
           {[
             { id: "overview", label: "Control Centre" },
             {
+              id: "doctor_availability",
+              label: "Doctor Availability & Assignment",
+            },
+            {
               id: "doctors",
               label: "1. Doctor Master & Workspace",
               count: doctors.length,
@@ -2557,6 +2562,23 @@ export default function Administration({
                   <Stethoscope size={15} />
                   <span>Live Doctors Workspace & Patient Oversight</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDoctorSubTab("availability")
+                    setAdminInspectingDoctor(null)
+                  }}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 text-[12.5px] font-bold rounded-md transition-all cursor-pointer ${
+                    doctorSubTab === "availability"
+                      ? "bg-[#1B4FD8] text-white shadow-xs"
+                      : "bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0] hover:text-[#0F172A]"
+                  }`}
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <Stethoscope size={15} />
+                  <span>Availability & Assignment Engine</span>
+                </button>
               </div>
 
               {doctorSubTab === "directory" ? (
@@ -2868,6 +2890,18 @@ export default function Administration({
               </div>
             </div>
             )}
+
+            {/* DOCTOR AVAILABILITY & ASSIGNMENT ENGINE VIEW */}
+            {doctorSubTab === "availability" && (
+              <DoctorAvailabilityDashboard />
+            )}
+          </div>
+        )}
+
+        {/* ── TAB: DOCTOR AVAILABILITY & ASSIGNMENT ENGINE ─────────────────── */}
+        {activeTab === "doctor_availability" && (
+          <div className="space-y-4">
+            <DoctorAvailabilityDashboard />
           </div>
         )}
 

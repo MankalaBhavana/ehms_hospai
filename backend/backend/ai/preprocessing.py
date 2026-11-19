@@ -23,8 +23,13 @@ an upload.
 
 import io
 
-import cv2
-import numpy as np
+try:
+    import cv2
+    import numpy as np
+except ImportError:
+    cv2 = None
+    np = None
+
 from PIL import Image, ImageOps
 
 # Long side, in pixels. Handwriting stays legible at this size, and a page this
@@ -62,6 +67,8 @@ def _bound_size(image: Image.Image) -> Image.Image:
 
 
 def _lift_contrast(image: Image.Image) -> Image.Image:
+    if cv2 is None or np is None:
+        return image
     bgr = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
     lab = cv2.cvtColor(bgr, cv2.COLOR_BGR2LAB)
     l_channel, a_channel, b_channel = cv2.split(lab)

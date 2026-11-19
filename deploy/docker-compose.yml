@@ -46,6 +46,7 @@ services:
       PG_POOL_MAX: "20"
       PUBLIC_BASE_URL: ${PUBLIC_APP_URL:-}
       CELERY_TASK_ALWAYS_EAGER: "true"
+      SEED_DEMO_DOCTORS: ${SEED_DEMO_DOCTORS:-true}
     expose:
       - "8010"
 

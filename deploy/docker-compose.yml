@@ -1,0 +1,72 @@
+# Production stack: PostgreSQL + backend + web.
+#
+#   cp deploy/.env.example deploy/.env       # then fill in every value
+#   docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
+#
+# Put TLS in front of the "web" service (a reverse proxy / load balancer / Cloudflare tunnel) and
+# keep TRUST_PROXY=true. Only "web" is published; the database and backend stay private.
+name: ehms
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hospai}
+      POSTGRES_USER: ${POSTGRES_USER:-hospai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      TZ: UTC
+    command: ["postgres", "-c", "max_connections=200", "-c", "timezone=UTC"]
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hospai} -d ${POSTGRES_DB:-hospai}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      TRUST_PROXY: "true"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-hospai}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-hospai}
+      SESSION_PEPPER: ${SESSION_PEPPER:?set SESSION_PEPPER (random, 32+ chars)}
+      SESSION_COOKIE_SECURE: "true"
+      SESSION_COOKIE_SAMESITE: Lax
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-12}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:?set INITIAL_ADMIN_PASSWORD (8+ chars, change after first login)}
+      PG_POOL_MIN: "2"
+      PG_POOL_MAX: "20"
+      PUBLIC_BASE_URL: ${PUBLIC_APP_URL:-}
+      CELERY_TASK_ALWAYS_EAGER: "true"
+    expose:
+      - "8010"
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/web.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      PORT: "8443"
+      BACKEND_URL: http://backend:8010
+      PUBLIC_APP_URL: ${PUBLIC_APP_URL:-}
+      TRUST_PROXY: "true"
+      DATA_DIR: /data
+    volumes:
+      - webdata:/data
+    ports:
+      - "${WEB_PORT:-8443}:8443"
+
+volumes:
+  dbdata:
+  webdata:

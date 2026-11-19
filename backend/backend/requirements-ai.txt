@@ -1,0 +1,6 @@
+# Optional OCR / document-AI / speech features.
+-r requirements.txt
+numpy==2.5.1
+opencv-python-headless==5.0.0.93
+lightrag-hku==1.5.7
+faster-whisper==1.2.1

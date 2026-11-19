@@ -1,0 +1,36 @@
+# secrets and local configuration
+.env
+.env.*
+!.env.example
+!deploy/.env.example
+
+# live data - never commit patient information
+backend/.pgdata/
+frontend/server/data/
+*.sqlite
+*.db
+
+# build output and dependencies
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# logs / editor / OS
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# never ship
+backend.db
+__pycache__/
+.pytest_cache/
+frontend/dist/
+*.ps1
+frontend/tests/.out/
+HospAI_Clinical_Knowledge/01_Source_Library/HL7_FHIR/fhir-spec_R4_downloaded-2026-11-18.zip

@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+.git
+backend/.pgdata
+frontend/server/data
+**/.env
+**/.env.*
+!**/.env.example
+*.log
+FIXES_AND_TODO.md

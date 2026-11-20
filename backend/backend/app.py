@@ -675,6 +675,9 @@ app.register_blueprint(ot_bp)
 from modules.queue.routes import queue_bp
 app.register_blueprint(queue_bp)
 
+from modules.doctor_availability.routes import doctor_availability_bp
+app.register_blueprint(doctor_availability_bp)
+
 
 @app.errorhandler(DatabaseBusy)
 def _handle_database_busy(exc):

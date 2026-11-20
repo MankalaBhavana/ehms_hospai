@@ -145,8 +145,8 @@ def op_visit_assign_doctor(appointment_id):
     )
     if res == "not_found":
         return jsonify({"error": "OP visit not found"}), 404
-    if res == "unavailable":
-        return jsonify({"error": "Doctor is unavailable"}), 409
+    if res != "ok":
+        return jsonify({"error": res, "status": "blocked"}), 409
     log_audit_event("update", "op_doctor_assignment", str(appointment_id), {"doctor_name": doctor_name})
     return jsonify({"status": "ok", "doctor_name": doctor_name})
 

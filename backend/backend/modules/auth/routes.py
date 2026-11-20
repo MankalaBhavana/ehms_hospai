@@ -137,6 +137,24 @@ def login():
         ip_address=request.headers.get("X-Forwarded-For", request.remote_addr),
         user_agent=request.headers.get("User-Agent"),
     )
+
+    # Doctor availability login hook
+    try:
+        from services.doctor_availability_service import (
+            get_doctor_record,
+            get_doctor_availability,
+            notify_doctor_became_available,
+        )
+        doc = get_doctor_record(user.get("username"), hospital_id=user.get("hospital_id"))
+        if doc:
+            avail = get_doctor_availability(doc["id"], hospital_id=user.get("hospital_id"))
+            if avail and avail.get("is_eligible"):
+                notify_doctor_became_available(
+                    doc["doctor_name"], doc["department"], hospital_id=user.get("hospital_id")
+                )
+    except Exception:
+        pass
+
     response = jsonify({"user": {k: v for k, v in user.items() if k != "id"}})
     response.headers["Cache-Control"] = "no-store"
     response.set_cookie(
@@ -224,6 +242,27 @@ def auth_session():
 def logout():
     session_token = request.cookies.get(SESSION_COOKIE_NAME)
     if session_token:
+        try:
+            from services.doctor_availability_service import (
+                get_doctor_record,
+                get_unassigned_queue,
+                notify_doctor_logout_with_pending_queue,
+            )
+            user = get_session_user(session_token)
+            if user:
+                doc = get_doctor_record(user.get("username"), hospital_id=user.get("hospital_id"))
+                if doc:
+                    queue = get_unassigned_queue(hospital_id=user.get("hospital_id"))
+                    dept_queue = [q for q in queue if q.get("department") == doc.get("department")]
+                    if dept_queue:
+                        notify_doctor_logout_with_pending_queue(
+                            doc["doctor_name"],
+                            doc["department"],
+                            len(dept_queue),
+                            hospital_id=user.get("hospital_id"),
+                        )
+        except Exception:
+            pass
         delete_session(session_token)
     response = jsonify({"message": "Logged out successfully"})
     response.set_cookie(SESSION_COOKIE_NAME, "", expires=0)

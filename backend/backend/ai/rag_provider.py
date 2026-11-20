@@ -14,9 +14,17 @@ import os
 import re
 import threading
 
-import numpy as np
-from lightrag import LightRAG, QueryParam
-from lightrag.utils import EmbeddingFunc
+try:
+    import numpy as np
+    from lightrag import LightRAG, QueryParam
+    from lightrag.utils import EmbeddingFunc
+    _LIGHTRAG_AVAILABLE = True
+except ImportError:
+    np = None
+    LightRAG = None
+    QueryParam = None
+    EmbeddingFunc = None
+    _LIGHTRAG_AVAILABLE = False
 
 from utils.embeddings import generate_embedding
 from .service import llm_provider
@@ -68,7 +76,7 @@ async def _rag_embedding_func(texts):
         return vectors
 
     vectors = await asyncio.to_thread(_call)
-    return np.array(vectors, dtype=float)
+    return np.array(vectors, dtype=float) if np is not None else vectors
 
 
 _RAG_INSTANCES: dict[str, LightRAG] = {}
@@ -111,6 +119,8 @@ def _run_on_bg_loop(coroutine):
 
 
 async def get_rag_instance(key: str) -> LightRAG:
+    if not _LIGHTRAG_AVAILABLE:
+        raise RuntimeError("LightRAG / numpy is not installed on this host.")
     if key not in _RAG_INSTANCES:
         working_dir = os.path.join(WORKSPACE_ROOT, key)
         os.makedirs(working_dir, exist_ok=True)
@@ -141,12 +151,16 @@ async def _aquery_graph(key: str, query: str, mode: str = "hybrid") -> str:
 
 def insert_text_into_graph(key: str, text: str):
     """Synchronous entry point for Flask route handlers."""
+    if not _LIGHTRAG_AVAILABLE:
+        raise RuntimeError("LightRAG is not installed on this host.")
     _run_on_bg_loop(_ainsert_text(key, text))
 
 
 def query_graph(key: str, query: str, mode: str = "hybrid") -> str:
+    if not _LIGHTRAG_AVAILABLE:
+        raise RuntimeError("LightRAG is not installed on this host.")
     return _run_on_bg_loop(_aquery_graph(key, query, mode=mode))
 
 
 def is_configured() -> bool:
-    return _llm_provider.is_configured()
+    return _LIGHTRAG_AVAILABLE and _llm_provider.is_configured()

@@ -29,8 +29,6 @@ def assign_queue_patient(appointment_id):
     result = assign_op_doctor(appointment_id, doctor_name, hospital_id=current_hospital_id())
     if result == "not_found":
         return jsonify({"error": "Queue entry not found"}), 404
-    if result == "incompatible":
-        return jsonify({"error": "Doctor specialty is incompatible with this OP visit"}), 409
-    if result == "unavailable":
-        return jsonify({"error": "Doctor is unavailable"}), 409
+    if result != "ok":
+        return jsonify({"error": result}), 409
     return jsonify({"status": "ok", "doctor_name": doctor_name})

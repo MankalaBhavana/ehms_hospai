@@ -669,6 +669,9 @@ app.register_blueprint(icu_bp)
 from modules.clinical.routes import clinical_bp
 app.register_blueprint(clinical_bp)
 
+from modules.smartrx.routes import smartrx_bp
+app.register_blueprint(smartrx_bp)
+
 from modules.ot.routes import ot_bp
 app.register_blueprint(ot_bp)
 

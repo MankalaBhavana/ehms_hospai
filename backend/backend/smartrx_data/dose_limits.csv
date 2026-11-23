@@ -1,0 +1,38 @@
+drug,population,max_single_mg,max_daily_mg,max_mg_per_kg_day,max_doses_per_week,note,source,status
+paracetamol,adult,1000,4000,,,"Lower the limit (e.g. 3 g/day) in liver disease, malnutrition, chronic alcohol use","Standard prescribing references (product labels, national formularies); pending clinical review",draft
+paracetamol,child,,,75,,Weight-based; do not exceed adult maximum,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+ibuprofen,adult,800,2400,,,Use the lowest effective dose for the shortest time,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+ibuprofen,child,,,40,,Weight-based,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+diclofenac,adult,75,150,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+naproxen,adult,500,1250,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+aceclofenac,adult,100,200,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+etoricoxib,adult,120,120,,,Higher doses only for short acute use,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+tramadol,adult,100,400,,,Lower in the elderly and renal impairment,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+metformin,adult,1000,3000,,,Reduce in renal impairment (see renal rules),"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+domperidone,adult,10,30,,,QT risk; shortest duration,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+ondansetron,adult,16,24,,,QT risk at high doses,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+pantoprazole,adult,80,80,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+amoxicillin,adult,1000,3000,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+amoxicillin,child,,,90,,High-dose regimen ceiling,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+ciprofloxacin,adult,750,1500,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+levofloxacin,adult,750,750,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+metronidazole,adult,1000,4000,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+ceftriaxone,child,,,100,,Weight-based; maximum 4 g/day,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+ceftriaxone,adult,4000,4000,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+cefixime,child,,,8,,Weight-based,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+atorvastatin,adult,80,80,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+simvastatin,adult,40,40,,,80 mg is no longer recommended (myopathy risk),"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+rosuvastatin,adult,40,40,,,Start lower in Asian patients and renal impairment,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+amlodipine,adult,10,10,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+telmisartan,adult,80,80,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+enalapril,adult,40,40,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+cetirizine,adult,10,10,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+levocetirizine,adult,5,5,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+montelukast,adult,10,10,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+gabapentin,adult,1200,3600,,,Reduce in renal impairment,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+pregabalin,adult,300,600,,,Reduce in renal impairment,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+alprazolam,adult,2,4,,,Dependence risk; shortest duration,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+lorazepam,adult,4,10,,,,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+sildenafil,adult,100,100,,,Once daily at most for erectile dysfunction,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+tadalafil,adult,20,20,,,As-needed use; once daily at most,"Standard prescribing references (product labels, national formularies); pending clinical review",draft
+methotrexate,adult,25,,,1,Non-oncology use is WEEKLY: daily dosing is a recognised fatal error,"Standard prescribing references (product labels, national formularies); pending clinical review",draft

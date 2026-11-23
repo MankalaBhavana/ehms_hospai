@@ -1,0 +1,79 @@
+# SmartRx: runbook
+
+Deterministic prescription safety engine. No LLM output ever produces an alert, and no alert blocks signing.
+
+## Set up / upgrade
+```
+cd backend/backend
+export DATABASE_URL=postgresql://...        # same variable as the API
+python smartrx_pipeline/step2_ingest_db.py  # runs pending migrations, then reloads knowledge in ONE transaction
+python smartrx_pipeline/benchmark.py        # exit code 1 if search is slower than 50 ms
+```
+- Migrations: `modules/smartrx/migrations/NNN_*.sql`, forward-only, checksummed. Never edit an applied file; add a new one.
+- Knowledge files: `SMARTRX_DATA_DIR` (default `backend/backend/smartrx_data`).
+- Re-running ingest is safe; `smartrx.patient_allergy` is never truncated.
+- Ingest aborts, writing nothing, if a rule or class cannot be tied to a substance (`--allow-unresolved` overrides).
+
+## Behaviour switches
+| Variable | Default | Meaning |
+|---|---|---|
+| `SMARTRX_INCLUDE_DRAFT` | false | Also load `draft` rules/classes/cross-reactivity (shadow-mode review). Alerts carry `knowledge_status: draft`. |
+| `SMARTRX_LAB_STALE_DAYS` | 90 | Older renal results are used but flagged stale. |
+| `SMARTRX_FUZZY_MIN_RATIO` | 0.86 | Minimum similarity for typo correction (always shown as "interpreted as"). |
+| `SMARTRX_MAX_ITEMS` | 60 | Max lines per evaluation. |
+| `SMARTRX_RULE_CACHE_SECONDS` | 60 | How often the knowledge version is re-checked. |
+
+## API (all need a session; reads `patients.read`, allergy writes `patients.clinical.write`)
+`GET /api/smartrx/health` · `GET /api/smartrx/catalog/search` · `POST /api/smartrx/evaluate` ·
+`GET|POST /api/smartrx/patients/<id>/allergies` · `DELETE .../allergies/<n>` · `POST .../allergies/import-legacy`
+
+`/evaluate` returns `check_status` (`complete` | `partial`) with `partial_reasons`; a 503 `engine_unavailable` means
+checks did NOT run and the UI must say so.
+
+## Governance
+Rules and classes carry `status` (`draft`/`approved`/`retired`), `reviewed_by`, `reviewed_at`. The engine loads only `approved`
+unless `SMARTRX_INCLUDE_DRAFT` is set. The `rule_set_version` (date + content hash) is returned on every evaluation.
+
+## Provenance: no clinical advice without a citation
+Every rule row has `provenance`: `unsourced` (never loads, not even in shadow mode), `cited` (legacy / label-level citation, active only if
+approved, always reported as unverified) or `verified` (source_id from `Source_Log.csv` + page + verbatim quote, extracted by one person and
+approved by a different person). The database itself refuses an `approved` row that is `unsourced`. Every alert carries `provenance` and,
+for verified rules, `source_ref` (for example `SRC_012, p.34`). `/api/smartrx/health` -> `knowledge_integrity` shows how much is verified.
+
+```
+python smartrx_pipeline/validate_knowledge.py --worklist   # CI check; writes unsourced_worklist.csv (what still needs a guideline citation)
+```
+To source a rule: fill `provenance=verified, source_id, source_page, source_quote, extracted_by, reviewed_by, approved_by, approved_at`
+and `status=approved` in its CSV row. `SMARTRX_ALLOW_UNSOURCED=true` is a development/test switch only; never set it in a deployment.
+
+## Phase 2 knowledge (interactions, dose limits, pregnancy/lactation, antibiotic policy, formulary)
+The CSVs in `smartrx_data/` are the **source of truth**; ingest reloads them. Clinical review = edit the row in the CSV
+(`status` -> `approved`, add `reviewed_by` and `reviewed_at` columns) and commit: git is the audit trail.
+
+| File | Content | Shipped status |
+|---|---|---|
+| `drug_interactions.csv` | 47 curated high-severity pairs (class or substance) | `draft` |
+| `interaction_label_candidates.csv` | ~630 mention-level pairs mined from label text; `info` only, quotes the label sentence | `draft` |
+| `dose_limits.csv` | adult / child max single, daily, mg/kg/day, doses/week | `draft` |
+| `reproductive_risk.csv` | pregnancy / lactation by drug or class | `draft` |
+| `antibiotic_policy.csv` | global Reserve-tier list | `draft` |
+| `drug_classes.csv` | therapeutic classes used by the above | `draft` |
+| `drug_synonyms.csv` | INN/BAN <-> USAN names (paracetamol = acetaminophen) and combination names | n/a |
+
+Nothing marked `draft` reaches prescribers unless `SMARTRX_INCLUDE_DRAFT=true` (shadow mode).
+Regenerate label candidates after a GenericMaster refresh: `python smartrx_pipeline/step3_mine_label_interactions.py`.
+
+Hospital-specific data lives in `smartrx.hospital_formulary` and `smartrx.antibiotic_policy (hospital_id = N)`; it is runtime data and is
+never touched by ingest. Manage via `GET|PUT /api/smartrx/hospital/formulary`, `DELETE .../formulary/<id>`,
+`PUT /api/smartrx/hospital/antibiotic-policy` (write needs `pharmacy.inventory.write`).
+
+Request additions to `/evaluate`: `lactating` (bool), `current_medications` (list of names, max 40). Recent prescriptions in
+`pharmacy_prescriptions` (last `SMARTRX_ACTIVE_MED_DAYS`, default 14) are also treated as current: that table has no duration or
+frequency, so "current" is a recency heuristic.
+
+Known limits: dose checks apply only to single-ingredient lines with a mass strength (mg/g/mcg) and need the patient's age;
+combination products, liquids (mg/5 ml) and bare numbers ("500") are reported as "not checked", never guessed. Hepatic-impairment
+rules are not implemented: there is no structured liver-function source.
+
+## Tests
+`python -m pytest tests/test_smartrx_api.py` — pure tests always run; database tests skip unless the knowledge is loaded.

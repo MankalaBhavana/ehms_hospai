@@ -57,10 +57,13 @@ const Pharmacy = lazy(() => import("./components/Pharmacy"))
 
 const Billing = lazy(() => import("./components/Billing"))
 const LabBillingQueue = lazy(() => import("./components/LabBillingQueue"))
+const InsuredPatientBilling = lazy(() => import("./components/billing/InsuredPatientBilling"))
+const BillingDashboard = lazy(() => import("./components/billing/BillingDashboard"))
+const RevenueDashboard = lazy(() => import("./components/billing/RevenueDashboard"))
+
 const InsuranceClaims = lazy(() => import("./components/insurance/ClaimsHome"))
 const InsuranceSettlementPage = lazy(() => import("./components/insurance/SettlementPage"))
 const InsurancePaymentGaps = lazy(() => import("./components/insurance/PaymentGapsPage"))
-const InsuredPatientBilling = lazy(() => import("./components/billing/InsuredPatientBilling"))
 const EnhancedAuditRulesPage = lazy(() => import("./components/insurance/EnhancedAuditRulesPage"))
 const InsuranceDashboardView = lazy(() => import("./components/insurance/InsuranceDashboardView"))
 const InsuranceCommandDashboard = lazy(() => import("./components/insurance/InsuranceCommandDashboard"))
@@ -76,9 +79,6 @@ import { InsuranceEngineService } from "./services/insuranceDb"
 import { TransferNotices } from "./services/transferNotices"
 import { IpCare, setCurrentActor } from "./services/ipCare"
 import { HospAILogo } from "./components/HospAILogo"
-const BillingDashboard = lazy(() => import("./components/billing/BillingDashboard"))
-
-const RevenueDashboard = lazy(() => import("./components/billing/RevenueDashboard"))
 
 const Inpatient = lazy(() => import("./components/Inpatient"))
 

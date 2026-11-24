@@ -2158,11 +2158,16 @@ export async function apiFetch<T = any>(
   // would let any credential (or a hand-edited localStorage) sign in, so they
   // are only ever answered locally in dev mode when the backend is unreachable.
   const isCredentialRequest = path === "/api/auth/login" || path === "/api/auth/session"
+  // Staff accounts and doctor availability are decided by the server alone. A browser-store answer
+  // here made a failed save look successful until the next refresh, so these are never mocked.
+  const isServerAuthoritative =
+    path.startsWith("/api/admin/users") || path.startsWith("/api/doctor-availability")
 
   // Serve ER, bed management, reports, EMR, and patient notes directly from live persistent store.
   // Authentication is excluded here deliberately -- see isAuthRequest below.
   if (
     !isAuthRequest &&
+    !isServerAuthoritative &&
     LOCAL_MOCKS_ENABLED && (
     path.startsWith("/api/admin") ||
     path.startsWith("/api/er") ||
@@ -2185,7 +2190,7 @@ export async function apiFetch<T = any>(
 
   const now = Date.now()
 
-  if (!isAuthRequest && LOCAL_MOCKS_ENABLED && !isBackendOnline && now - lastBackendProbeTime < PROBE_INTERVAL_MS) {
+  if (!isAuthRequest && !isServerAuthoritative && LOCAL_MOCKS_ENABLED && !isBackendOnline && now - lastBackendProbeTime < PROBE_INTERVAL_MS) {
     const cachedLocalResult = await handleLocalErMock<T>(path, options)
 
     if (cachedLocalResult !== null) {
@@ -2284,6 +2289,7 @@ export async function apiFetch<T = any>(
       // Explicit server conflicts (409) and validation errors (400) should never be masked by local mocks.
       if (
         !isCredentialRequest &&
+        !isServerAuthoritative &&
         response.status !== 409 &&
         response.status !== 400 &&
         (response.status >= 500 || response.status === 404 || response.status === 401 || LOCAL_MOCKS_ENABLED)
@@ -2321,7 +2327,7 @@ export async function apiFetch<T = any>(
     // Offline fallback to browser stores. Login/session only fall back when the
     // backend gave no answer at all, and only in local dev mode.
     const serverAnswered = typeof err?.status === "number"
-    if (!isCredentialRequest || (LOCAL_MOCKS_ENABLED && !serverAnswered)) {
+    if (!isServerAuthoritative && (!isCredentialRequest || (LOCAL_MOCKS_ENABLED && !serverAnswered))) {
       const localResult = await handleLocalErMock<T>(path, options)
       if (localResult !== null) {
         return localResult as T

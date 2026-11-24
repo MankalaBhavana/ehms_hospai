@@ -10,6 +10,7 @@ import { DiagnosticTariffDatabase } from "../../services/diagnosticTariffDb"
 import { Users } from "lucide-react"
 import toast from "react-hot-toast"
 import ConsultationCharges from "./ConsultationCharges"
+import DoctorAvailabilityBar from "./DoctorAvailabilityBar"
 import { Icon } from "../icons"
 import { Btn, StatusBadge } from "../shared"
 import ApplyLeaveModal from "../hrms/ApplyLeaveModal"
@@ -907,6 +908,7 @@ export default function DoctorPortal({
           </button>
         </div>
       )}
+      {!isSuperAdmin && <DoctorAvailabilityBar />}
       <PortalHeader
         doctor={doctor}
         isSuperAdmin={isSuperAdmin}

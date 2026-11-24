@@ -4,6 +4,7 @@
  */
 
 import { apiFetch } from "../lib/api"
+import { isLiveActive, liveStatusOf } from "./doctorLiveAvailability"
 
 export type DoctorSection = "Main" | "Visiting"
 
@@ -339,9 +340,19 @@ export function getDoctorConsultationFee(name: string): number {
   return 0
 }
 
+/** Verified AND currently active in the availability engine (logged in, in their time slot, set Active). */
+export function isDoctorBookable(d: MasterDoctor): boolean {
+  return Boolean(d && d.verified) && isLiveActive({ name: d.name, staffId: d.staffId, username: d.username, id: d.id })
+}
+
+/** Doctors that may be listed and scheduled for appointments right now. */
+export function getBookableDoctors(): MasterDoctor[] {
+  return getDoctorMaster().filter(isDoctorBookable)
+}
+
 export function doctorsForSpecialty(specialty: string): MasterDoctor[] {
   return getDoctorMaster().filter(
-    (d) => d.verified && d.specialty === specialty,
+    (d) => isDoctorBookable(d) && d.specialty === specialty,
   )
 }
 
@@ -354,6 +365,11 @@ export function availabilityOf(
 } {
   if (!doctor.verified || !doctor.specialty) {
     return { bookable: false, label: "Needs verification", onRequest: false }
+  }
+
+  const live = liveStatusOf({ name: doctor.name, staffId: doctor.staffId, username: doctor.username, id: doctor.id })
+  if (live && !live.eligible) {
+    return { bookable: false, label: live.label || "Not active", onRequest: false }
   }
 
   return doctor.section === "Main"

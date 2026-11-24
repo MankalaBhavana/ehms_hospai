@@ -23,7 +23,7 @@ import { RoleDatabase } from "./roleDb"
  * could drift out of sync.
  */
 
-import { db, DBOPEncounter, DBPatient } from "./db"
+import { isHeldForPayment, db, DBOPEncounter, DBPatient } from "./db"
 import { encounterArrivalIso, encounterArrivalMs } from "./encounterTime"
 import type {
   ConsultationNoteSummary,
@@ -166,6 +166,8 @@ export function doesDoctorMatchEncounter(
   encounter: DBOPEncounter,
 ): boolean {
   if (!doctor || !encounter) return false
+  // Booked but the consultation fee is unpaid: the patient is still at reception, not with a doctor.
+  if (isHeldForPayment(encounter)) return false
 
   // 1. Direct ID / StaffId / Username match
   const encAssignedId = ((encounter as any).assignedDoctorId || (encounter as any).doctorId || "").trim().toLowerCase()

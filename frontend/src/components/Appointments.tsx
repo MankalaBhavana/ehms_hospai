@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useMemo } from "react"
+import { useLiveDoctorAvailability } from "../services/doctorLiveAvailability"
 import toast from "react-hot-toast"
 import { StatusBadge, Btn, Card } from "./shared"
 import { Icon } from "./icons"
 import PhoneInput from "./ui/PhoneInput"
-import { db, DBOPEncounter } from "../services/db"
+import { db, DBOPEncounter, isHeldForPayment } from "../services/db"
 import {
   bookAppointment,
   type AppointmentBooking,
 } from "../services/appointmentBooking"
 import {
   getDoctorMaster,
+  getBookableDoctors,
   pickDoctorForSpecialty,
   availabilityOf,
   getDoctorByName,
@@ -167,6 +169,7 @@ export function AppointmentBookingModal({
   onSchedule: (appt: any) => void
   onGoToBilling?: (encounterId?: string) => void
 }) {
+  useLiveDoctorAvailability() // re-render when a doctor goes active / inactive
   const [bookingMode, setBookingMode] = useState<"direct" | "ai">("direct")
   const [registryType, setRegistryType] = useState<"OP" | "IP">("OP")
   const [patient, setPatient] = useState(initialEncounter?.patientName || "")
@@ -184,7 +187,7 @@ export function AppointmentBookingModal({
   const [isAnalyzing, setIsAnalyzing] = useState(false)
 
   // Direct Doctor & Specialty Selection
-  const allDoctors = getDoctorMaster().filter((d) => d.verified)
+  const allDoctors = getBookableDoctors()
   const allSpecialties = Array.from(
     new Set(allDoctors.map((d) => d.specialty).filter(Boolean)),
   ) as string[]
@@ -676,6 +679,7 @@ export default function Appointments({
   onNavigateToOPWorkflow?: (encId: string, step?: number) => void
   onNavigateToDoctorWorkflow?: (encId: string) => void
 }) {
+  useLiveDoctorAvailability() // re-render when a doctor goes active / inactive
   const [encounters, setEncounters] = useState<DBOPEncounter[]>([])
   const [selectedDept, setSelectedDept] = useState<string>("All Departments")
   const [searchQuery, setSearchQuery] = useState("")
@@ -691,6 +695,7 @@ export default function Appointments({
     phone?: string
     token?: string
     time?: string
+    consultationFee?: number
   } | null>(null)
   const weekDays = useMemo(() => getDynamicWeekDays(), [])
   const todayIdx = useMemo(() => {
@@ -811,7 +816,8 @@ export default function Appointments({
       e.status !== "Under Consultation" &&
       e.status !== "Doctor Assigned",
   ).length
-  const activeDoctorsCount = getDoctorMaster().filter((d) => d.verified).length
+  const activeDoctorsCount = getBookableDoctors().length
+  const heldEncounters = encounters.filter((e) => isHeldForPayment(e))
 
   const handleAddAppointment = async (booking: AppointmentBooking) => {
     let booked
@@ -833,9 +839,10 @@ export default function Appointments({
       phone: booked.phone,
       token: booked.token,
       time: booked.time,
+      consultationFee: booked.consultationFee,
     })
     toast.success(
-      `Appointment confirmed for ${booked.name} with ${booked.doctor}! Token: ${booked.token}`,
+      `Appointment booked for ${booked.name} with ${booked.doctor} (token ${booked.token}). Consultation fee is pending in Billing.`,
     )
   }
 
@@ -939,6 +946,9 @@ export default function Appointments({
               <p className="text-[13.5px] font-bold text-[#166534]">
                 Appointment Booked — {justBooked.name} with {justBooked.doctor}
               </p>
+              <span className="text-[11px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded border border-amber-300">
+                💳 Payment pending{justBooked.consultationFee ? ` · ₹${justBooked.consultationFee}` : ""}
+              </span>
               {justBooked.token && (
                 <span className="text-[11px] font-bold bg-[#DCFCE7] text-[#15803D] px-2 py-0.5 rounded border border-[#BBF7D0]">
                   Token {justBooked.token}
@@ -947,6 +957,7 @@ export default function Appointments({
             </div>
             <p className="text-[12px] text-[#15803D] mt-1">
               UMR: <strong className="font-mono">{justBooked.umr}</strong> · {justBooked.dept} · {justBooked.room}.
+              {" "}The bill is now in Billing. The patient reaches the nurse and doctor once the consultation fee is paid.
             </p>
             {/* What really happened to the patient's confirmation message. */}
             <div className="mt-2">
@@ -970,6 +981,52 @@ export default function Appointments({
             >
               Dismiss
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Booked patients still waiting to pay: held at reception, not yet visible to the nurse or doctor */}
+      {heldEncounters.length > 0 && (
+        <div className="mx-6 mt-3 border border-amber-300 bg-amber-50 px-4 py-3">
+          <p className="text-[12.5px] font-bold text-amber-900">
+            💳 {heldEncounters.length} booked patient{heldEncounters.length === 1 ? "" : "s"} awaiting consultation payment
+            <span className="ml-2 font-normal text-amber-800">
+              They are held at reception and are not shown to the nurse or the doctor until the fee is paid.
+            </span>
+          </p>
+          <div className="mt-2 divide-y divide-amber-200 border border-amber-200 bg-white">
+            {heldEncounters.map((enc) => (
+              <div key={enc.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-[12px]">
+                <span>
+                  <strong className="text-[#0F172A]">{enc.patientName}</strong>
+                  <span className="text-[#64748B]"> · {enc.umr} · {enc.assignedDoctor} · {enc.dept}</span>
+                </span>
+                <span className="flex items-center gap-2">
+                  {onGoToBilling && (
+                    <button
+                      type="button"
+                      onClick={() => onGoToBilling(enc.id)}
+                      className="border border-blue-600 bg-[#1B4FD8] px-2.5 py-1 font-bold text-white hover:bg-[#1740B4]"
+                    >
+                      Collect fee →
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const reason = (window.prompt(`Release ${enc.patientName} to the nurse and doctor WITHOUT payment?\n\nType the reason (it is recorded on the visit):`) || "").trim()
+                      if (reason.length < 3) return
+                      db.releasePaymentHold(enc.id, "Reception", reason)
+                      setEncounters(db.getEncounters())
+                      toast.success(`${enc.patientName} released without payment. Reason recorded.`)
+                    }}
+                    className="border border-amber-400 bg-white px-2.5 py-1 font-semibold text-amber-800 hover:bg-amber-100"
+                  >
+                    Release (exception)
+                  </button>
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -1243,13 +1300,12 @@ export default function Appointments({
               </div>
 
               <div className="p-3 space-y-2 max-h-[550px] overflow-y-auto">
-                {getDoctorMaster().filter((d) => d.verified).length === 0 ? (
+                {getBookableDoctors().length === 0 ? (
                   <div className="p-4 text-center text-xs text-[#64748B]">
                     No doctors registered in roster. Add doctors from Administration.
                   </div>
                 ) : (
-                  getDoctorMaster()
-                    .filter((d) => d.verified)
+                  getBookableDoctors()
                     .map((doc) => (
                       <div
                         key={doc.id}

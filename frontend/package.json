@@ -23,6 +23,7 @@
     "test:dashboard": "rolldown tests/dashboard.test.ts --platform node --format cjs --no-codeSplitting -o tests/.out/dashboard.cjs && node tests/.out/dashboard.cjs",
     "test:dictation": "rolldown tests/dictation.test.ts --platform node --format cjs -o tests/.out/dictation.cjs && node tests/.out/dictation.cjs",
     "test:access": "rolldown tests/access.e2e.ts --platform node --format cjs -o tests/.out/access.cjs && node tests/.out/access.cjs",
+    "test:appt-billing": "rolldown tests/appointment-billing.e2e.ts --platform node --format cjs --no-codeSplitting -o tests/.out/appointment-billing.cjs && node tests/.out/appointment-billing.cjs",
     "test:billing": "rolldown tests/billing-stay.e2e.ts --platform node --format cjs -o tests/.out/billing-stay.cjs && node tests/.out/billing-stay.cjs",
     "test:billing-filter": "rolldown tests/billing-filter.test.ts --platform node --format cjs -o tests/.out/billing-filter.cjs && node tests/.out/billing-filter.cjs"
   },

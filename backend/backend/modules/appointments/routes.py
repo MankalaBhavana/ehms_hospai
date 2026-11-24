@@ -171,6 +171,25 @@ def appointments_create():
         return jsonify({"error": "visit_type must be OP or IP"}), 400
     payload["visit_type"] = str(payload["visit_type"]).upper()
 
+    # Only an Active, logged-in, on-duty doctor may be given an appointment.
+    requested_doctor = str(payload.get("doctor_name") or "").strip()
+    if requested_doctor:
+        try:
+            from services.doctor_availability_service import (
+                get_doctor_record,
+                is_doctor_eligible_for_assignment,
+            )
+
+            if get_doctor_record(requested_doctor, hospital_id=current_hospital_id()):
+                eligible, reason, _details = is_doctor_eligible_for_assignment(
+                    requested_doctor, hospital_id=current_hospital_id()
+                )
+                if not eligible:
+                    return jsonify({"error": f"{requested_doctor} cannot take appointments: {reason}"}), 409
+        except Exception:  # never block booking on an engine fault
+            import logging
+            logging.getLogger(__name__).exception("doctor availability check failed")
+
     appointment_id, token_no, patient_id = create_appointment(
         payload, hospital_id=current_hospital_id()
     )

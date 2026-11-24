@@ -1,0 +1,25 @@
+name: deploy-demo
+# Every push to main redeploys the demo server, so the demo link always shows the latest code.
+# Repo secrets needed: DEMO_HOST, DEMO_USER, DEMO_SSH_KEY (private key), optional DEMO_PATH (default /opt/ehms).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency: deploy-demo
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        env:
+          HOST: ${{ secrets.DEMO_HOST }}
+          USER_NAME: ${{ secrets.DEMO_USER }}
+          KEY: ${{ secrets.DEMO_SSH_KEY }}
+          APP_PATH: ${{ secrets.DEMO_PATH || '/opt/ehms' }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_deploy "$USER_NAME@$HOST" "set -e; cd '$APP_PATH' && git fetch origin main && git reset --hard origin/main && docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.tls.yml --env-file deploy/.env up -d --build && docker image prune -f"

@@ -29,6 +29,12 @@ export interface AppUser {
 
   department?: string
 
+  /** Contact and profile details returned by the server (read-only in the staff list). */
+  email?: string
+  phone?: string
+  jobRole?: string
+  createdAt?: string
+
   /** Individual user-level module overrides */
   allowedModules?: string[]
 

@@ -46,6 +46,22 @@ python smartrx_pipeline/validate_knowledge.py --worklist   # CI check; writes un
 To source a rule: fill `provenance=verified, source_id, source_page, source_quote, extracted_by, reviewed_by, approved_by, approved_at`
 and `status=approved` in its CSV row. `SMARTRX_ALLOW_UNSOURCED=true` is a development/test switch only; never set it in a deployment.
 
+## Guideline index and quote verification (Step 2)
+Every registered guideline (148 PDFs, HTML pages and the LactMed archive) is indexed page by page, so a reviewer can find the passage and the system
+can prove a citation is real.
+
+```
+python smartrx_pipeline/step4_index_guidelines.py          # ~45 s for the whole library; incremental (unchanged files are skipped)
+python smartrx_pipeline/step4_index_guidelines.py --ocr    # also OCR pages with no text layer (slow; needs: pip install rapidocr-onnxruntime)
+python smartrx_pipeline/search_guidelines.py "metformin eGFR" --exclude-ocr
+```
+- A rule marked `verified` must cite `source_id` + `source_page` + a verbatim `source_quote`. Ingest checks the quote really appears on that page
+  (case, typography and line-break hyphens are ignored; **digits and units must match exactly**). It rejects the rule otherwise, and says which page the wording is on.
+- Citations cannot rest on **OCR** pages (OCR can misread digits) or on a document whose **file hash differs from `Source_Log.csv`**.
+- Each file's SHA-256 is compared with the register on every run; mismatches are reported and recorded in `smartrx.guideline_document`.
+- LactMed is parsed straight from the `.tar.gz` (entities and network access disabled); nothing is extracted to disk.
+- If OCR libraries were installed with `pip --target`, point `SMARTRX_OCR_LIBS` at that folder.
+
 ## Phase 2 knowledge (interactions, dose limits, pregnancy/lactation, antibiotic policy, formulary)
 The CSVs in `smartrx_data/` are the **source of truth**; ingest reloads them. Clinical review = edit the row in the CSV
 (`status` -> `approved`, add `reviewed_by` and `reviewed_at` columns) and commit: git is the audit trail.

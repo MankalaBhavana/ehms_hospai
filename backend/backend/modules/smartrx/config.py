@@ -28,6 +28,7 @@ ACTIVE_MED_DAYS = int(os.getenv("SMARTRX_ACTIVE_MED_DAYS", "14"))
 MAX_CURRENT_MEDS = 25
 
 # Register of guideline documents; `verified` knowledge must cite a source_id found here.
-SOURCE_LOG = Path(os.getenv("SMARTRX_SOURCE_LOG") or (Path(__file__).resolve().parents[4] / "HospAI_Clinical_Knowledge" / "Source_Log.csv"))
+KNOWLEDGE_ROOT = Path(os.getenv("SMARTRX_KNOWLEDGE_ROOT") or (Path(__file__).resolve().parents[4] / "HospAI_Clinical_Knowledge"))
+SOURCE_LOG = Path(os.getenv("SMARTRX_SOURCE_LOG") or (KNOWLEDGE_ROOT / "Source_Log.csv"))
 # Development/test switch only: lets `unsourced` rows load. In any real deployment leave this unset.
 ALLOW_UNSOURCED = os.getenv("SMARTRX_ALLOW_UNSOURCED", "false").strip().lower() in ("1", "true", "yes")

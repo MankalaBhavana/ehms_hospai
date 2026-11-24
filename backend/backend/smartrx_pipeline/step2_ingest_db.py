@@ -25,7 +25,7 @@ import psycopg2  # noqa: E402
 from psycopg2.extras import execute_batch  # noqa: E402
 
 from modules.smartrx import migrate  # noqa: E402
-from modules.smartrx import provenance  # noqa: E402
+from modules.smartrx import provenance, quotes  # noqa: E402
 from modules.smartrx.config import DATA_DIR, SOURCE_LOG  # noqa: E402
 from modules.smartrx.textnorm import build_moiety_map, name_key, normalize_text  # noqa: E402
 from utils.database import DATABASE_URL, _normalize_database_url  # noqa: E402
@@ -117,6 +117,10 @@ def stamp(cur, table, where_sql, where_params, filename, row, source_ids, proble
     prov, f = provenance.effective(filename, row)
     if prov not in provenance.PROVENANCE_VALUES:
         return
+    if prov == "verified" and f["source_id"] and f["source_page"] and f["source_quote"]:
+        ok, reason = quotes.verify_quote(cur, f["source_id"], f["source_page"], f["source_quote"])
+        if not ok:
+            problems.append(f"{filename}: {row.get('drug') or row.get('a') or row.get('target') or row.get('drug_name') or row.get('from_class')}: citation not verified: {reason}")
     final_status = (row.get("status") or provenance.DEFAULT_STATUS.get(filename, "draft")).strip().lower()
     cur.execute(f"""UPDATE smartrx.{table} SET status=%s, provenance=%s, source_id=%s, source_page=%s, source_section=%s, source_quote=%s,
                         extracted_by=%s, reviewed_by=COALESCE(%s, reviewed_by), approved_by=%s, approved_at=%s

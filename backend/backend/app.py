@@ -597,10 +597,6 @@ from modules.ai_exports.routes import ai_exports_bp
 
 app.register_blueprint(ai_exports_bp)
 
-from modules.accounts.routes import accounts_bp
-
-app.register_blueprint(accounts_bp)
-
 from modules.auth.routes import auth_bp
 
 app.register_blueprint(auth_bp)

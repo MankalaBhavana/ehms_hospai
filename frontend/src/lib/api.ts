@@ -2161,7 +2161,9 @@ export async function apiFetch<T = any>(
   // Staff accounts and doctor availability are decided by the server alone. A browser-store answer
   // here made a failed save look successful until the next refresh, so these are never mocked.
   const isServerAuthoritative =
-    path.startsWith("/api/admin/users") || path.startsWith("/api/doctor-availability")
+    path.startsWith("/api/admin/users") || path.startsWith("/api/doctor-availability") ||
+    // A medication safety check must never be answered from the browser store: a made-up "no alerts" would look like a clearance.
+    path.startsWith("/api/smartrx")
 
   // Serve ER, bed management, reports, EMR, and patient notes directly from live persistent store.
   // Authentication is excluded here deliberately -- see isAuthRequest below.

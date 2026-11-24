@@ -33,7 +33,6 @@ const DEPT_INFO: Record<string, { name: string; icon: string; description: strin
   billing: { name: "Billing & Cash Desk", icon: "💳", description: "Inpatient/Outpatient invoicing, fee settlements, and receipts" },
   surgery: { name: "Operation Theatre & Surgery", icon: "🔪", description: "Operation theatre bookings, surgical notes, and anesthesia records" },
   insurance: { name: "Insurance & TPA", icon: "🛡️", description: "Cashless pre-auth requests, claim document packs, query responses, settlements" },
-  accounts: { name: "Finance & Accounts", icon: "📊", description: "General ledger, journal vouchers, accounts payable/receivable, and P&L" },
   employees: { name: "Hospital Staff & Users", icon: "👥", description: "Employee master directory, credentials, and access role governance" },
   intelligence: { name: "Hosp AI Clinical Intelligence", icon: "🤖", description: "Diagnostic triage suggestions, symptom assistance, and clinical NLP" },
   reports: { name: "Hospital Analytics & Reports", icon: "📈", description: "Executive statistics, census reports, financial summaries, and KPIs" },

@@ -113,7 +113,6 @@ const NAVIGATION_MODULE_ALIASES: Record<string, string[]> = {
   intelligence: ["intelligence", "dpi_ocr", "symptom_ai", "clinical_rag", "clinical_summaries", "bulk_ai", "nl_filtering"],
   billing: ["billing", "billing_op", "billing_ip", "billing_er", "lab_billing", "billing_unified", "billing_insured", "payments", "billing_revenue"],
   insurance: ["insurance", "insurance_overview", "insurance_patient_policies", "insurance_eligibility", "insurance_preauth", "insurance_claims", "insurance_emails", "insurance_settlement", "insurance_gaps", "insurance_masters", "insurance_docrules"],
-  accounts: ["accounts", "accounts_dashboard", "accounts_coa", "accounts_gl", "accounts_receipts", "accounts_payments", "accounts_ar", "accounts_ap", "accounts_cash_bank", "accounts_pharmacy", "accounts_insurance", "accounts_tax", "accounts_budget", "accounts_assets", "accounts_reports", "accounts_period_close", "accounts_audit", "accounts_manager"],
   hrms: ["hrms", "employees", "hr_attendance", "scheduling", "hr_staffing", "hr_leave", "hr_approvals", "hr_payroll", "hr_recruitment", "hr_organization", "hr_training", "hr_performance", "hr_compliance", "hr_grievances", "hr_reports", "hr_announcements", "my_hr"],
   patient_experience: ["patient_exp", "patient_messages"],
   reports: [
@@ -157,8 +156,6 @@ export function loginUserFromAuthenticated(
     reception: "ROLE_RECEPTIONIST",
     billing: "ROLE_BILLING_EXECUTIVE",
     insurance: "ROLE_INSURANCE_TPA_OFFICER",
-    finance: "ROLE_ACCOUNTANT",
-    accountant: "ROLE_ACCOUNTANT",
     hr: "ROLE_HR_MANAGER",
     radiologist: "ROLE_RADIOLOGIST",
     radiology: "ROLE_RADIOLOGIST",
@@ -231,7 +228,7 @@ type RoleGroup =
   | "Nursing"
   | "Diagnostics"
   | "Pharmacy"
-  | "Front Office & Finance"
+  | "Front Office & Billing"
   | "Operations & HR"
 
 const ROLE_GROUP_ORDER: RoleGroup[] = [
@@ -240,7 +237,7 @@ const ROLE_GROUP_ORDER: RoleGroup[] = [
   "Nursing",
   "Diagnostics",
   "Pharmacy",
-  "Front Office & Finance",
+  "Front Office & Billing",
   "Operations & HR",
 ]
 
@@ -250,7 +247,7 @@ const ROLE_GROUP_ICON: Record<RoleGroup, React.ComponentType<{ className?: strin
   Nursing: HeartPulse,
   Diagnostics: FlaskConical,
   Pharmacy: Pill,
-  "Front Office & Finance": ClipboardList,
+  "Front Office & Billing": ClipboardList,
   "Operations & HR": Briefcase,
 }
 
@@ -260,7 +257,7 @@ const ROLE_GROUP_TONE: Record<RoleGroup, { tile: string; solid: string; dot: str
   Nursing: { tile: "bg-[#FFF1F2] text-[#E11D48]", solid: "bg-gradient-to-br from-[#E11D48] to-[#F43F5E] text-white", dot: "bg-[#F43F5E]" },
   Diagnostics: { tile: "bg-[#F5F3FF] text-[#7C3AED]", solid: "bg-gradient-to-br from-[#7C3AED] to-[#8B5CF6] text-white", dot: "bg-[#8B5CF6]" },
   Pharmacy: { tile: "bg-[#ECFDF5] text-[#059669]", solid: "bg-gradient-to-br from-[#059669] to-[#10B981] text-white", dot: "bg-[#10B981]" },
-  "Front Office & Finance": { tile: "bg-[#FFFBEB] text-[#D97706]", solid: "bg-gradient-to-br from-[#D97706] to-[#F59E0B] text-white", dot: "bg-[#F59E0B]" },
+  "Front Office & Billing": { tile: "bg-[#FFFBEB] text-[#D97706]", solid: "bg-gradient-to-br from-[#D97706] to-[#F59E0B] text-white", dot: "bg-[#F59E0B]" },
   "Operations & HR": { tile: "bg-[#F1F5F9] text-[#475569]", solid: "bg-gradient-to-br from-[#334155] to-[#64748B] text-white", dot: "bg-[#64748B]" },
 }
 
@@ -271,7 +268,7 @@ function roleGroupOf(role: LoginRoleOption): RoleGroup {
   if (/LAB|PATHOLOG|RADIOLOG/.test(k)) return "Diagnostics"
   if (/PHARM/.test(k)) return "Pharmacy"
   if (/DOCTOR|PHYSICIAN|SURGEON|ANESTHET|PHYSIO|CLINIC/.test(k)) return "Clinical"
-  if (/RECEPTION|FRONT|BILLING|CASHIER|ACCOUNT|FINANCE|INSURANCE|TPA|RECORDS/.test(k)) return "Front Office & Finance"
+  if (/RECEPTION|FRONT|BILLING|CASHIER|INSURANCE|TPA|RECORDS/.test(k)) return "Front Office & Billing"
   return "Operations & HR"
 }
 

@@ -49,9 +49,9 @@ const MODULE_CATEGORIES = [
   },
   {
     id: "finance",
-    title: "Revenue, Billing & Insurance",
-    description: "Cashier billing, financial accounts ledger, and cashless TPA insurance claims",
-    modules: ["billing", "accounts", "insurance"],
+    title: "Billing & Insurance",
+    description: "Cashier billing, patient invoices, and cashless TPA insurance claims",
+    modules: ["billing", "insurance"],
   },
   {
     id: "workforce",
@@ -88,7 +88,6 @@ export const ALL_ADMIN_ASSIGNABLE_MODULES: Array<{
   { key: "pharmacy", label: "Pharmacy & Dispensary", category: "Pharmacy", icon: "💊" },
   { key: "billing", label: "Billing & Cash Counter", category: "Finance", icon: "💳" },
   { key: "insurance", label: "Insurance & TPA Claims", category: "Finance", icon: "🛡️" },
-  { key: "accounts", label: "Accounts & General Ledger", category: "Finance", icon: "🏦" },
   { key: "employees", label: "Hospital Staff & User Accounts", category: "Management", icon: "👥" },
   { key: "intelligence", label: "Hosp AI Clinical Intelligence", category: "Management", icon: "🤖" },
   { key: "reports", label: "Reports & Hospital Analytics", category: "Management", icon: "📈" },
@@ -116,7 +115,6 @@ const MODULE_METADATA: Record<string, { name: string; icon: string; description:
   laboratory: { name: "Laboratory", icon: "🧪", description: "Specimen collection, hematology/biochemistry tests, and lab result sign-offs" },
   radiology: { name: "Radiology & Imaging", icon: "🩻", description: "X-Ray, CT, MRI, Ultrasound imaging worklists and radiologist reports" },
   billing: { name: "Billing & Cashier", icon: "💳", description: "OP/IP/ER invoices, cash desk receipts, lab payments, and refunds" },
-  accounts: { name: "Financial Accounts", icon: "📊", description: "General ledger, journal vouchers, accounts payable/receivable, and P&L" },
   insurance: { name: "Insurance & TPA", icon: "🛡️", description: "Cashless pre-auth requests, claim document packs, query responses, settlements" },
   admin: { name: "Administration", icon: "⚙️", description: "Centralized RBAC, user provisioning, clinical directory, tariff catalog" },
   employees: { name: "Hospital Staff & Users", icon: "👥", description: "Employee master directory, credentials, and access role governance" },
@@ -1042,11 +1040,11 @@ export default function Administration({
 
   const applyPresetFinance = () => {
     if (!selectedRole || selectedRoleIsProtected) return
-    const finMods = ["billing", "accounts", "insurance"]
+    const finMods = ["billing", "insurance"]
     const finRules = finMods.flatMap((m) => [`${m}:view`, `${m}:create`, `${m}:edit`, `${m}:approve`, `${m}:export`])
     const updatedRole = { ...selectedRole, allowedModules: finRules }
     setRoles(roles.map((r) => (r.id === selectedRole.id ? updatedRole : r)))
-    setRoleNotice("Applied Finance, Billing & TPA preset.")
+    setRoleNotice("Applied Billing & Insurance preset.")
   }
 
   const applyPresetReadOnly = () => {

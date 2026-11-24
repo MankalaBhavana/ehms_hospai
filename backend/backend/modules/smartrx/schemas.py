@@ -2,6 +2,7 @@
 from .config import MAX_ITEMS_PER_EVALUATION
 
 MAX_TEXT = 300
+SEVERITIES = ("critical", "warning", "info")
 
 
 class ValidationError(ValueError):
@@ -63,6 +64,7 @@ def validate_evaluate(payload):
 
     return {
         "patient_id": _text(payload.get("patient_id"), "patient_id", limit=60),
+        "encounter_id": _text(payload.get("encounter_id"), "encounter_id", limit=60),
         "patient_allergies": _text(payload.get("patient_allergies"), "patient_allergies", limit=2000),
         "patient_age": _text(payload.get("patient_age"), "patient_age", limit=10),
         "patient_sex": _text(payload.get("patient_sex"), "patient_sex", limit=10),
@@ -85,3 +87,28 @@ def validate_allergy(payload):
     if severity not in ("mild", "moderate", "severe", "unknown"):
         raise ValidationError("severity must be mild, moderate, severe or unknown", "severity")
     return {"text": text, "reaction": _text(payload.get("reaction"), "reaction"), "severity": severity}
+
+
+OVERRIDE_REASONS = ("benefit_outweighs_risk", "already_tolerating", "no_alternative", "dose_adjusted", "monitoring_planned", "other")
+
+
+def validate_override(payload):
+    if not isinstance(payload, dict):
+        raise ValidationError("JSON object expected")
+    reason = payload.get("reason_code")
+    if reason not in OVERRIDE_REASONS:
+        raise ValidationError(f"reason_code must be one of {', '.join(OVERRIDE_REASONS)}", "reason_code")
+    text = _text(payload.get("reason_text"), "reason_text", limit=500)
+    if reason == "other" and (not text or len(text) < 5):
+        raise ValidationError("please describe the reason (at least 5 characters)", "reason_text")
+    return {
+        "patient_id": _text(payload.get("patient_id"), "patient_id", required=True, limit=60),
+        "encounter_id": _text(payload.get("encounter_id"), "encounter_id", limit=60),
+        "alert_id": _text(payload.get("alert_id"), "alert_id", required=True, limit=160),
+        "check": _text(payload.get("check"), "check", limit=30),
+        "severity": payload.get("severity") if payload.get("severity") in SEVERITIES else None,
+        "drug_name": _text(payload.get("drug_name"), "drug_name", limit=300),
+        "rule_set_version": _text(payload.get("rule_set_version"), "rule_set_version", limit=40),
+        "reason_code": reason,
+        "reason_text": text,
+    }

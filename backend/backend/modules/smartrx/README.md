@@ -34,6 +34,25 @@ checks did NOT run and the UI must say so.
 Rules and classes carry `status` (`draft`/`approved`/`retired`), `reviewed_by`, `reviewed_at`. The engine loads only `approved`
 unless `SMARTRX_INCLUDE_DRAFT` is set. The `rule_set_version` (date + content hash) is returned on every evaluation.
 
+## Adding sources, and the doctor-workspace alert panel
+```
+python smartrx_pipeline/fetch_source.py smartrx_data/source_manifest_2026-11_india.csv --dry-run   # then without --dry-run
+python smartrx_pipeline/fetch_source.py --retry-failed                                              # register rows that failed on a transient error
+python smartrx_pipeline/step4_index_guidelines.py                                                   # index what was fetched
+```
+`fetch_source.py` accepts only real PDFs (file signature, not file name), enforces a size limit, never bypasses a login/licence/CAPTCHA, skips a URL or a
+file (SHA-256) already registered, and writes the file, its SHA-256, a `Source_Log.csv` row and a jurisdiction. The downloaded PDFs are **not committed**
+(size, and some carry a "no reproduction without permission" notice): only the register, manifest and jurisdiction rows are.
+
+The panel (`frontend/src/components/doctor/SmartRxPanel.tsx`, hook `useSmartRx`, client `services/smartrx.ts`) checks the sheet as the doctor types.
+- **Never a made-up answer:** if the server cannot be reached it says *the check did not run* (and does not block sending). `/api/smartrx/*` is excluded
+  from the browser mock store for this reason.
+- **Critical alerts need an acknowledgement with a reason** before the prescription is sent; the acknowledgement is saved to `smartrx.alert_override`
+  and restored after a reload. Warnings and notes never block.
+- Every alert shows how well-sourced it is (verified / cited / draft / hospital policy), the document and page, and the source's jurisdiction.
+- `smartrx.evaluation_log` records each evaluation (alert ids, severities, rule-set version, input hash) with no free-text or clinical values.
+- Frontend tests: `cd frontend && npm run test:smartrx`.
+
 ## Reviewer workflow (Step 3): from guideline to live rule
 ```
 python smartrx_pipeline/step5_build_worklist.py --drug metformin --drug "valproic acid"     # or no args: every drug the seed rules mention

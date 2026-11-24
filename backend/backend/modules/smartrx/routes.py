@@ -2,6 +2,8 @@
 
 All safety logic lives in engine.py / allergy.py / resolver.py and is deterministic.
 """
+import hashlib
+import json
 import logging
 import re
 
@@ -18,7 +20,7 @@ from . import context as context_mod
 from . import engine
 from .config import ENGINE_VERSION
 from .knowledge import KnowledgeUnavailable, get_knowledge
-from .schemas import ValidationError, validate_allergy, validate_evaluate
+from .schemas import ValidationError, validate_allergy, validate_evaluate, validate_override
 
 logger = logging.getLogger(__name__)
 smartrx_bp = Blueprint("smartrx", __name__)
@@ -133,7 +135,71 @@ def evaluate_prescription():
             return _unavailable(exc)
     result["status"] = "ok"
     result["patient_id"] = payload["patient_id"]
+    _log_evaluation(hospital_id, payload, result)
     return jsonify(result)
+
+
+def _log_evaluation(hospital_id, payload, result):
+    """Audit trail of what was shown. Best effort: a logging failure must never hide the safety result."""
+    try:
+        user = getattr(g, "current_user", None) or {}
+        digest = hashlib.sha256(json.dumps({"p": payload.get("patient_id"), "i": payload.get("items")}, sort_keys=True).encode()).hexdigest()
+        alerts = [{"id": a["id"], "check": a["check"], "severity": a["severity"], "drug_name": a.get("drug_name"),
+                   "provenance": a.get("provenance"), "source_ref": a.get("source_ref")} for a in result.get("alerts", [])]
+        with get_connection(autocommit=True) as conn:
+            conn.cursor().execute(
+                """INSERT INTO smartrx.evaluation_log (hospital_id, user_id, patient_id, encounter_id, rule_set_version, engine_version,
+                       check_status, item_count, alert_count, critical_count, warning_count, alerts, input_sha256)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s)""",
+                (hospital_id, str(user.get("username") or user.get("id") or ""), payload.get("patient_id"), payload.get("encounter_id"),
+                 result.get("rule_set_version"), result.get("engine_version"), result.get("check_status"), result.get("evaluated_count", 0),
+                 len(alerts), sum(a["severity"] == "critical" for a in alerts), sum(a["severity"] == "warning" for a in alerts),
+                 json.dumps(alerts), digest))
+    except Exception:  # noqa: BLE001
+        logger.warning("SmartRx evaluation log write failed", exc_info=True)
+
+
+@smartrx_bp.route("/api/smartrx/overrides", methods=["POST"])
+@require_permissions("patients.read")
+def record_override():
+    """A prescriber acknowledges a critical alert with a reason. Audit only: it never changes what the engine reports."""
+    try:
+        data = validate_override(request.get_json(silent=True))
+    except ValidationError as exc:
+        return _bad_request(exc)
+    hospital_id = current_hospital_id()
+    user = g.current_user
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""INSERT INTO smartrx.alert_override (hospital_id, user_id, user_name, patient_id, encounter_id, alert_id, check_name,
+                           severity, drug_name, rule_set_version, reason_code, reason_text)
+                       VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id, created_at""",
+                    (hospital_id, str(user.get("id") or ""), str(user.get("username") or user.get("name") or ""), data["patient_id"],
+                     data["encounter_id"], data["alert_id"], data["check"], data["severity"], data["drug_name"], data["rule_set_version"],
+                     data["reason_code"], data["reason_text"]))
+        row_id, created = cur.fetchone()
+        conn.commit()
+    return jsonify({"id": row_id, "created_at": created.isoformat(), **{k: data[k] for k in ("alert_id", "reason_code")}}), 201
+
+
+@smartrx_bp.route("/api/smartrx/overrides", methods=["GET"])
+@require_permissions("patients.read")
+def list_overrides():
+    """Acknowledgements already given for a patient (and optionally one encounter), so the screen can restore them after a reload."""
+    patient_id = (request.args.get("patient_id") or "").strip()[:60]
+    if not patient_id:
+        return _bad_request(ValidationError("patient_id is required", "patient_id"))
+    encounter_id = (request.args.get("encounter_id") or "").strip()[:60] or None
+    hospital_id = current_hospital_id()
+    with get_connection(autocommit=True) as conn:
+        cur = conn.cursor()
+        cur.execute("""SELECT id, created_at, alert_id, severity, drug_name, reason_code, reason_text, user_name
+                       FROM smartrx.alert_override
+                       WHERE COALESCE(hospital_id,0) = COALESCE(%s,0) AND patient_id = %s AND (%s::text IS NULL OR encounter_id = %s)
+                       ORDER BY id DESC LIMIT 200""", (hospital_id, patient_id, encounter_id, encounter_id))
+        items = [{"id": r[0], "created_at": r[1].isoformat(), "alert_id": r[2], "severity": r[3], "drug_name": r[4],
+                  "reason_code": r[5], "reason_text": r[6], "by": r[7]} for r in cur.fetchall()]
+    return jsonify({"items": items})
 
 
 # ---- structured allergies -------------------------------------------------------------------------------

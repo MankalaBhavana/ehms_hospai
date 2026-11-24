@@ -78,6 +78,16 @@ import { TONE, gradient } from "./doctorTheme"
  */
 
 import PrescriptionWhiteboard from "./PrescriptionWhiteboard"
+import SmartRxPanel from "./SmartRxPanel"
+import { useSmartRx } from "../../hooks/useSmartRx"
+import {
+  loadOverrides,
+  recordOverride,
+  unacknowledgedCriticals,
+  type Acknowledgements,
+  type SmartRxAlert,
+  type SmartRxPatient,
+} from "../../services/smartrx"
 import LiveBoard from "./LiveBoard"
 
 /**
@@ -769,6 +779,84 @@ export default function DoctorPortal({
     })
   }, [consultation, medications, labTests, uploadedRx, whiteboardImage])
 
+  // ── Medication safety check (SmartRx) ───────────────────────────────────────
+  // Decision support: it never signs or blocks by itself. A critical alert has to be acknowledged, with a reason that is
+  // written to the audit trail, before the prescription is sent. If the check cannot run, sending is NOT blocked: the
+  // panel says plainly that it did not run.
+  const smartRxPatient: SmartRxPatient | null = useMemo(
+    () =>
+      selected
+        ? {
+            patientId: selected.umr,
+            encounterId: selected.encounterId,
+            age: Number.isFinite(selected.age) ? selected.age : undefined,
+            sex: selected.sex,
+          }
+        : null,
+    [selected?.umr, selected?.encounterId, selected?.age, selected?.sex], // eslint-disable-line react-hooks/exhaustive-deps
+  )
+  const smartRx = useSmartRx(smartRxPatient, medications)
+  const [acks, setAcks] = useState<Acknowledgements>({})
+  const [ackBusy, setAckBusy] = useState<string | null>(null)
+  const [ackError, setAckError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setAcks({})
+    setAckError(null)
+    if (!smartRxPatient) return
+    let cancelled = false
+    loadOverrides(smartRxPatient).then((previous) => {
+      if (!cancelled) setAcks(previous)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [smartRxPatient?.patientId, smartRxPatient?.encounterId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleAcknowledge = async (alert: SmartRxAlert, reasonCode: string, reasonText: string) => {
+    if (!smartRxPatient) return
+    setAckBusy(alert.id)
+    setAckError(null)
+    const version = smartRx.state.outcome?.kind === "ok" ? smartRx.state.outcome.result.rule_set_version : undefined
+    // The acknowledgement counts only once the audit trail has it.
+    const saved = await recordOverride(smartRxPatient, alert, { reasonCode, reasonText }, version)
+    setAckBusy(null)
+    if (!saved.ok) {
+      setAckError(`The acknowledgement could not be saved (${saved.message}). Try again.`)
+      return
+    }
+    setAcks((prev) => ({ ...prev, [alert.id]: { reasonCode, reasonText, at: new Date().toISOString(), by: doctor.name } }))
+  }
+
+  const guardedDispatch = async (
+    targets: DispatchTargets = {},
+    override?: { medications: typeof medications; labTests: typeof labTests },
+  ) => {
+    const onlyInvestigations = targets.lab === true && !targets.pharmacy
+    if (smartRxPatient && !onlyInvestigations) {
+      const outcome = await smartRx.evaluateNow(smartRxPatient, override?.medications ?? medications)
+      const waiting = unacknowledgedCriticals(outcome ?? undefined, acks)
+      if (waiting.length) {
+        setError(
+          `Acknowledge the ${waiting.length} critical medication safety alert${waiting.length > 1 ? "s" : ""} (with a reason) before sending. They are listed under Medicines.`,
+        )
+        return
+      }
+    }
+    handleDispatch(targets, override)
+  }
+
+  const safetyPanel = (
+    <SmartRxPanel
+      state={smartRx.state}
+      acks={acks}
+      onAcknowledge={handleAcknowledge}
+      busyAlertId={ackBusy}
+      error={ackError}
+      stale={smartRx.state.status === "ready" && !smartRx.isCurrent}
+    />
+  )
+
   const canDispatch = pending.pharmacy || pending.lab
 
   /**
@@ -882,7 +970,7 @@ export default function DoctorPortal({
       setTab("review") // nothing was read: let the doctor fix the sheet instead of sending nothing
       return
     }
-    handleDispatch({ pharmacy: true, lab: true }, { medications: result.medications, labTests: result.labTests })
+    void guardedDispatch({ pharmacy: true, lab: true }, { medications: result.medications, labTests: result.labTests })
   }
 
   // ── Rendering ─────────────────────────────────────────────────────────────
@@ -1098,6 +1186,7 @@ export default function DoctorPortal({
                     key={selected.encounterId}
                     notification={selected}
                     doctor={doctor}
+                    safetyPanel={safetyPanel}
                     voiceSummary={voiceSummary}
                     aiStatus={aiStatus}
                     sheetMode={sheetMode}
@@ -1190,7 +1279,8 @@ export default function DoctorPortal({
                     canDispatch={canDispatch}
                     pending={pending}
                     dispatchResult={dispatchResult}
-                    onDispatch={handleDispatch}
+                    onDispatch={guardedDispatch}
+                    safetyPanel={safetyPanel}
                     onBackToSheet={() => setTab("sheet")}
                     onNextPatient={() => {
                       const nextWaiting = notifications.find(
@@ -3413,6 +3503,7 @@ function PrescriptionSheetStep({
   onDigitiseAndSendBoth,
   onBackToVoice,
   onStartFresh,
+  safetyPanel,
 }: {
   notification: DoctorNotification
   doctor: DoctorAccount
@@ -3442,6 +3533,7 @@ function PrescriptionSheetStep({
   onDigitiseAndSendBoth: () => void
   onBackToVoice: () => void
   onStartFresh: () => void
+  safetyPanel?: React.ReactNode
 }) {
   const hasVideo = !!video || !!persistedVideo
   const [videoOpen, setVideoOpen] = useState(hasVideo)
@@ -3944,6 +4036,8 @@ function PrescriptionSheetStep({
                 ))}
               </OrderGroup>
 
+              {safetyPanel}
+
               <OrderGroup
                 tone="amber"
                 title="Investigations"
@@ -4232,6 +4326,7 @@ function ReviewAndDispatch({
   onBackToSheet,
   onGoToCharges,
   onNextPatient,
+  safetyPanel,
 }: {
   split: PrescriptionSplit | null
   splitting: boolean
@@ -4252,6 +4347,7 @@ function ReviewAndDispatch({
   onBackToSheet: () => void
   onGoToCharges?: () => void
   onNextPatient?: () => void
+  safetyPanel?: React.ReactNode
 }) {
   // The hospital's own tests (lab catalogue, imaging, tests Administration added) with their live prices.
   const [, setTestListTick] = useState(0)
@@ -4485,6 +4581,8 @@ function ReviewAndDispatch({
           </p>
         </section>
       )}
+
+      {safetyPanel}
 
       {/* Medicines -> pharmacy */}
       <section className="bg-white border border-[#DDE2EC] rounded">

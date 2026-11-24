@@ -34,6 +34,28 @@ checks did NOT run and the UI must say so.
 Rules and classes carry `status` (`draft`/`approved`/`retired`), `reviewed_by`, `reviewed_at`. The engine loads only `approved`
 unless `SMARTRX_INCLUDE_DRAFT` is set. The `rule_set_version` (date + content hash) is returned on every evaluation.
 
+## Reviewer workflow (Step 3): from guideline to live rule
+```
+python smartrx_pipeline/step5_build_worklist.py --drug metformin --drug "valproic acid"     # or no args: every drug the seed rules mention
+   -> <knowledge root>/08_Reviewer_Worklists/<date>/worklist.html   (read this), worklist.csv, coverage.csv, missing_sources.csv
+
+python smartrx_pipeline/knowledge_review.py template --kind dose_limit                      # columns for the extraction sheet
+python smartrx_pipeline/knowledge_review.py submit extractions.csv                          # validate (dry run)
+python smartrx_pipeline/knowledge_review.py submit extractions.csv --apply                  # append as draft + cited (inactive)
+python smartrx_pipeline/knowledge_review.py list                                            # rows waiting for a second person
+python smartrx_pipeline/knowledge_review.py approve --row-id ab12cd34 --reviewer "Dr A" --approver "Dr B"
+python smartrx_pipeline/step2_ingest_db.py                                                  # the rule goes live
+```
+1. **Find.** The worklist shows, per drug and topic (dose, renal, hepatic, pregnancy, contraindication, interaction, stewardship), the guideline sentences that
+   mention it: Indian sources first, drug names highlighted, OCR pages and hash-mismatched files flagged. `coverage.csv` shows where the library has *nothing*.
+2. **Extract.** A named person copies the wording into a sheet row (kind, subject, severity, message, `source_id`, page, exact quote, their name).
+   `submit` rejects: unknown drugs/classes, invalid values, rules the engine cannot evaluate, a quote that is not on that page, OCR or tampered sources,
+   duplicates, and **treatment content (clinical rules, antibiotic policy) citing a non-Indian source**.
+3. **Approve.** A second person re-reads the page and runs `approve`. It re-verifies the quote and enforces reviewer != approver and approver != extractor.
+   AI/system names are refused. Only then is the row `approved` + `verified`.
+Source jurisdiction (India / WHO / International / US) comes from `smartrx_data/source_jurisdiction.csv` (reviewable), is stored on `guideline_source`,
+and appears on every alert as `source_jurisdiction`.
+
 ## Provenance: no clinical advice without a citation
 Every rule row has `provenance`: `unsourced` (never loads, not even in shadow mode), `cited` (legacy / label-level citation, active only if
 approved, always reported as unverified) or `verified` (source_id from `Source_Log.csv` + page + verbatim quote, extracted by one person and

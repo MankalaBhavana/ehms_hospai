@@ -83,6 +83,7 @@ def test_verified_rule_loads_by_default_and_alert_cites_its_source(db, verified_
     r = engine.evaluate(cur, kb, ctx, [item], 1)
     a = [x for x in r["alerts"] if x["check"] == "dose"]
     assert a and a[0]["provenance"] == "verified" and a[0]["source_ref"] == "SRC_001, p.12" and a[0]["is_blocking"] is False
+    assert a[0]["source_jurisdiction"] == "India"          # SRC_001 is the national NLEM
 
 
 def test_legacy_rules_are_active_but_flagged_unverified(db):

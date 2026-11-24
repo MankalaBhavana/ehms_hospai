@@ -157,6 +157,12 @@ def main():
                         for r in csv.DictReader(fh) if r.get("source_id")]
             execute_batch(cur, "INSERT INTO smartrx.guideline_source VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING", rows)
             print(f"Guideline register: {len(rows)} sources from {SOURCE_LOG.name}")
+            jpath = DATA_DIR / "source_jurisdiction.csv"
+            if jpath.exists():
+                with open(jpath, encoding="utf-8", newline="") as fh:
+                    jrows = [(r["jurisdiction"], r["source_id"]) for r in csv.DictReader(fh)]
+                execute_batch(cur, "UPDATE smartrx.guideline_source SET jurisdiction = %s WHERE source_id = %s", jrows)
+                print(f"Jurisdiction set for {len(jrows)} sources")
         else:
             print(f"WARNING: {SOURCE_LOG} not found; no source can be verified")
 

@@ -34,6 +34,7 @@ def _alert(aid, check, severity, title, message, recommendation, source, drug_na
         a["knowledge_status"] = rule["status"]
         a["provenance"] = rule.get("provenance")
         a["source_ref"] = _source_ref(rule)
+        a["source_jurisdiction"] = rule.get("jurisdiction")
     a.update(extra)
     return a
 
@@ -228,7 +229,7 @@ def evaluate(cur, kb: KnowledgeBase, ctx: PatientContext, items: list, hospital_
                                          f"Possible Cross-Reactivity: {label} → {kb.classes[x['to_class']]['name']}",
                                          x["message"], x["recommendation"], x["source"], item["name"],
                                          allergen=label, matched_on=basis, knowledge_status=x["status"],
-                                         provenance=x.get("provenance"), source_ref=_source_ref(x)))
+                                         provenance=x.get("provenance"), source_ref=_source_ref(x), source_jurisdiction=x.get("jurisdiction")))
 
     # 3. duplicate therapy (same active moiety on two lines)
     for i in range(len(resolved)):

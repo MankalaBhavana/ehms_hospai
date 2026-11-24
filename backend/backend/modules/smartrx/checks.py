@@ -12,7 +12,8 @@ _RANK = {"critical": 0, "warning": 1, "info": 2}
 def _p(d):
     """Knowledge-status and provenance fields for an alert built from knowledge row `d`."""
     ref = d["source_id"] + (f", p.{d['source_page']}" if d.get("source_page") else "") if d.get("source_id") else None
-    return {"knowledge_status": d["status"], "provenance": d.get("provenance"), "source_ref": ref}
+    return {"knowledge_status": d["status"], "provenance": d.get("provenance"), "source_ref": ref,
+            "source_jurisdiction": d.get("jurisdiction")}
 
 
 def _alert(aid, check, severity, title, message, recommendation, source, drug_name, status="approved", **extra):

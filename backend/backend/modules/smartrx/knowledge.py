@@ -96,8 +96,20 @@ def _load(cur, version) -> KnowledgeBase:
         rule["moieties"] = set(row[16] or [])
         kb.rules.append(rule)
     _load_phase2(cur, kb, statuses)
+    _attach_jurisdiction(cur, kb)
     kb.loaded_at = time.monotonic()
     return kb
+
+
+def _attach_jurisdiction(cur, kb):
+    """Stamp each knowledge row with the jurisdiction (India/WHO/US/International) of the guideline it cites."""
+    cur.execute("SELECT source_id, jurisdiction FROM smartrx.guideline_source")
+    jur = dict(cur.fetchall())
+    rows = list(kb.rules) + list(kb.cross) + list(kb.interactions) + list(kb.repro) + list(kb.policy.values())
+    for limits in kb.dose_limits.values():
+        rows.extend(limits)
+    for d in rows:
+        d["jurisdiction"] = jur.get(d.get("source_id")) if d.get("source_id") else None
 
 
 def _members(kb, kind, ref):

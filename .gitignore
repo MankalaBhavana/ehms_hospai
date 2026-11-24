@@ -34,3 +34,12 @@ frontend/dist/
 *.ps1
 frontend/tests/.out/
 HospAI_Clinical_Knowledge/01_Source_Library/HL7_FHIR/fhir-spec_R4_downloaded-2026-11-18.zip
+
+# Extracted copies of third-party datasets: too large for GitHub (100 MB file limit) or duplicates of the
+# .zip archives that are already tracked. Re-creatable from the archives / Source_Log.csv (URL + SHA-256).
+HospAI_Clinical_Knowledge/01_Medicine_Catalogue/DrugInfromationServiceBundle_v1.25_downloaded-2026-11-18/
+HospAI_Clinical_Knowledge/01_Source_Library/CLNtk/CLNtk_Toolkit_Package_downloaded-2026-11-17/
+HospAI_Clinical_Knowledge/01_Source_Library/HL7_FHIR/fhir-spec_R4_downloaded-2026-11-18/
+HospAI_Clinical_Knowledge/01_Source_Library/LactMed/LactMed_bulk_downloaded-2026-11-23/
+HospAI_Clinical_Knowledge/01_Source_Library/RxNorm/RxNorm_full_prescribe_11022026_downloaded-2026-11-18/
+HospAI_Clinical_Knowledge/02_Lab_Codes/DrugInformationServiceBundle_v1.0_downloaded-2026-11-17/

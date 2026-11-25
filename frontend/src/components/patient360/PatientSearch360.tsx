@@ -55,13 +55,24 @@ function Panel({ title, icon, badge, children, action, className }: { title: str
   )
 }
 
-const LISTS = ["diagnoses", "vitals", "medications", "investigations", "lab_orders", "documents", "invoices", "claims", "surgeries", "beds", "er_visits", "admissions", "encounters", "appointments", "journeys", "checkpoints", "tasks", "survey_responses", "communications", "authorizations"]
+const LISTS = ["diagnoses", "vitals", "medications", "investigations", "lab_orders", "documents", "invoices", "claims", "surgeries", "beds", "er_visits", "admissions", "encounters", "appointments", "further_appointments", "journeys", "checkpoints", "tasks", "survey_responses", "communications", "authorizations"]
 
 const none = (t: string) => <p className="text-[#64748B]">{t}</p>
 
 function Overview({ d, go }: { d: Row; go: (t: Tab) => void }) {
   const p = d.patient
   const latestVisit = d.encounters[0] || d.admissions[0]
+  const nextAppt = (d.further_appointments && d.further_appointments[0]) || d.appointments.filter((a: Row) => ["scheduled", "checked_in", "confirmed", "booked", "pending"].includes(a.status))[0] || d.appointments[0]
+  const whatsappSymptomText = d.whatsapp_symptoms?.symptoms || d.patient?.symptoms || latestVisit?.symptoms || latestVisit?.chief_complaint
+  const whatsappSymptomDate = d.whatsapp_symptoms?.received_at || d.patient?.updated_at
+  const isAwaitingTriage = latestVisit && (
+    latestVisit.status === "Awaiting Triage" ||
+    latestVisit.status === "Registered" ||
+    latestVisit.status === "In Queue" ||
+    latestVisit.status === "Symptoms Captured" ||
+    latestVisit.department === "Awaiting Triage" ||
+    (latestVisit.status || "").toLowerCase().includes("triage")
+  )
   const activeJourney = d.journeys.find((j: Row) => j.state === "active") || d.journeys[0]
   const jCps = activeJourney ? d.checkpoints.filter((c: Row) => c.journey_id === activeJourney.id && c.status !== "cancelled") : []
   const progress = jCps.length ? Math.round((jCps.filter((c: Row) => DONE.includes(c.status)).length / jCps.length) * 100) : 0
@@ -92,7 +103,22 @@ function Overview({ d, go }: { d: Row; go: (t: Tab) => void }) {
             <Tile icon="📋" label="Open Tasks" value={d.tasks.filter((t: Row) => !["resolved", "cancelled"].includes(t.status)).length} />
           </div>
         </Panel>
-        <Panel title="Latest Encounter" badge={latestVisit && <Badge status={latestVisit.status || (latestVisit.discharge_date ? "completed" : "active")} />} action={{ label: "View Details", onClick: () => go("encounters") }}>
+        <Panel
+          title="Latest Encounter"
+          badge={
+            latestVisit && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <Badge status={latestVisit.status || (latestVisit.discharge_date ? "completed" : "active")} />
+                {isAwaitingTriage && (
+                  <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-0.5 text-[10.5px] font-bold text-amber-900 border border-amber-300">
+                    ⏳ Triage Pending
+                  </span>
+                )}
+              </div>
+            )
+          }
+          action={{ label: "View Details", onClick: () => go("encounters") }}
+        >
           {latestVisit ? (
             <>
               <div className="text-[14px] font-semibold text-gray-900">{latestVisit.encounter_type === "OP" ? "OPD Consultation" : latestVisit.encounter_type ? `${latestVisit.encounter_type} visit` : "Inpatient admission"}</div>
@@ -101,6 +127,33 @@ function Overview({ d, go }: { d: Row; go: (t: Tab) => void }) {
               <div className="font-medium text-gray-900">{d.appointments[0]?.doctor_name || latestVisit.attending_doctor || "—"}</div>
               <div className="mt-2 text-[#64748B]">Complaint / Summary</div>
               <div>{latestVisit.chief_complaint || latestVisit.admission_reason || d.diagnoses[0]?.diagnosis_name || "Not recorded"}</div>
+
+              {/* Further Appointments & Current Symptoms beside Awaiting Triage */}
+              <div className="mt-3 space-y-2 border-t border-[#E2E8F0] pt-2.5">
+                <div className="rounded border border-[#DCE6FB] bg-[#F4F7FE] p-2 text-[11.5px]">
+                  <div className="flex items-center justify-between font-semibold text-gray-800">
+                    <span className="flex items-center gap-1">📅 Further Appointment</span>
+                    {nextAppt && <Badge status={nextAppt.status} />}
+                  </div>
+                  {nextAppt ? (
+                    <div className="mt-0.5 text-gray-900 font-medium">
+                      <span className="text-[#1B4FD8] font-bold">{fmtDateTime(nextAppt.appointment_date)}</span> · {nextAppt.doctor_name || "Doctor"} ({nextAppt.department || "General"})
+                    </div>
+                  ) : (
+                    <div className="mt-0.5 text-[#64748B]">No further appointments scheduled.</div>
+                  )}
+                </div>
+
+                <div className="rounded border border-emerald-200 bg-emerald-50/70 p-2 text-[11.5px]">
+                  <div className="flex items-center justify-between font-semibold text-emerald-900">
+                    <span className="flex items-center gap-1">🩺 Symptoms</span>
+                    {whatsappSymptomDate && <span className="text-[10px] text-emerald-700 font-normal">{fmtDate(whatsappSymptomDate)}</span>}
+                  </div>
+                  <div className="mt-0.5 text-gray-900 font-medium italic">
+                    {whatsappSymptomText ? `"${whatsappSymptomText}"` : "None reported"}
+                  </div>
+                </div>
+              </div>
             </>
           ) : none("No encounters recorded.")}
         </Panel>
@@ -222,6 +275,18 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
 
   const p = d.patient
   const visit = d.appointments[0]
+  const nextAppt = (d.further_appointments && d.further_appointments[0]) || d.appointments.filter((a: Row) => ["scheduled", "checked_in", "confirmed", "booked", "pending"].includes(a.status))[0] || d.appointments[0]
+  const latestVisit = d.encounters?.[0] || d.admissions?.[0]
+  const isAwaitingTriage = latestVisit && (
+    latestVisit.status === "Awaiting Triage" ||
+    latestVisit.status === "Registered" ||
+    latestVisit.status === "In Queue" ||
+    latestVisit.status === "Symptoms Captured" ||
+    latestVisit.department === "Awaiting Triage" ||
+    (latestVisit.status || "").toLowerCase().includes("triage")
+  )
+  const whatsappSymptomText = d.whatsapp_symptoms?.symptoms || d.patient?.symptoms || latestVisit?.symptoms || latestVisit?.chief_complaint
+  const whatsappSymptomDate = d.whatsapp_symptoms?.received_at || d.patient?.updated_at
   const openTasks = d.tasks.filter((t: Row) => !["resolved", "cancelled"].includes(t.status)).length
   const admitted = d.admissions.some((a: Row) => !a.discharge_date)
   const facts: Array<[string, string, string]> = [
@@ -243,6 +308,11 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
               <h2 className="text-2xl font-semibold text-gray-900">{fullName(p)}</h2>
               <Badge tone="green">● Active</Badge>
               <Badge tone="blue">{admitted ? "Inpatient" : p.patient_type && p.patient_type !== "regular" ? pretty(p.patient_type) : "OPD Patient"}</Badge>
+              {isAwaitingTriage && (
+                <span className="inline-flex items-center gap-1 rounded bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-900 border border-amber-300">
+                  ⏳ Awaiting Triage
+                </span>
+              )}
             </div>
             <div className="mt-0.5 text-[13px] text-[#475569]">{p.patient_id}</div>
             <dl className="mt-4 grid grid-cols-2 gap-y-3 md:grid-cols-3 xl:flex xl:divide-x xl:divide-[#E2E8F0]">
@@ -253,6 +323,35 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
                 </div>
               ))}
             </dl>
+
+            {/* Prominent Banner when Awaiting Triage or displaying Further Appointments & WhatsApp Symptoms */}
+            <div className="mt-3.5 flex flex-wrap items-center gap-3 rounded-lg border border-amber-200 bg-amber-50/80 px-3.5 py-2 text-[12px]">
+              <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                <span className="animate-pulse">⏳</span>
+                <span>Awaiting Triage</span>
+              </div>
+              <span className="text-amber-300">|</span>
+              <div className="flex items-center gap-1.5 text-gray-800">
+                <span className="font-semibold text-gray-700">📅 Further Appointment:</span>
+                {nextAppt ? (
+                  <span className="font-bold text-[#1B4FD8]">
+                    {fmtDateTime(nextAppt.appointment_date)} · {nextAppt.doctor_name || "Doctor"} ({nextAppt.department || "General"})
+                  </span>
+                ) : (
+                  <span className="text-[#64748B]">None scheduled</span>
+                )}
+              </div>
+              <span className="text-amber-300">|</span>
+              <div className="flex items-center gap-1.5 text-gray-800">
+                <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800 border border-emerald-300">
+                  Symptoms:
+                </span>
+                <span className="font-medium text-gray-900 italic">
+                  {whatsappSymptomText ? `"${whatsappSymptomText}"` : "None reported"}
+                </span>
+                {whatsappSymptomDate && <span className="text-[10.5px] text-[#64748B]">({fmtDate(whatsappSymptomDate)})</span>}
+              </div>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <button className={btnCls.ghost} onClick={() => window.open(patientPageUrl(p.patient_id), "_blank", "noopener")}>✎ Open Full Record</button>
@@ -292,7 +391,19 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
   )
 }
 
-/** Hosp AI → Patient 360°: one search box (patient ID, name or mobile) that opens the patient's full connected profile. */
+// --- Hero landing page data source nodes for circular diagram ---
+const DATA_NODES = [
+  { icon: "🫀", label: "Medical History",  angle: -135 },
+  { icon: "📋", label: "Clinical Records", angle: -90  },
+  { icon: "🧪", label: "Lab & Imaging",    angle: -45  },
+  { icon: "💊", label: "Medications",      angle: 0    },
+  { icon: "📅", label: "Appointments",     angle: 45   },
+  { icon: "🧭", label: "Care Journey",     angle: 90   },
+  { icon: "💬", label: "Communications",   angle: 135  },
+  { icon: "📄", label: "Documents",        angle: 180  },
+]
+
+/** Hosp AI → Patient 360°: hero landing page + search. */
 export default function PatientSearch360({ navigate }: { navigate: (module: string) => void }) {
   const [query, setQuery] = useState("")
   const [busy, setBusy] = useState(false)
@@ -315,51 +426,222 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
   }
   const clear = () => { setQuery(""); setMatches(null); setOpenId(null); setError("") }
 
-  return (
-    <div className="flex-1 overflow-y-auto bg-[#F0F2F5]">
-      <div className="space-y-4 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Patient 360°</h1>
-            <p className="text-[12.5px] text-[#64748B]">Unified patient profile and care coordination</p>
+  // ── When a patient is open show slim header + profile ──
+  if (openId) {
+    return (
+      <div className="flex-1 overflow-y-auto bg-[#F0F2F5]">
+        <div className="space-y-4 p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">Patient 360°</h1>
+              <p className="text-[12.5px] text-[#64748B]">Unified patient profile and care coordination</p>
+            </div>
+            <form onSubmit={search} role="search" className="flex min-w-[320px] flex-1 gap-2 rounded-xl border border-[#CBD5E1] bg-white p-1.5 shadow-sm md:max-w-2xl">
+              <span aria-hidden className="flex items-center pl-2 text-[#64748B]">🔍</span>
+              <input aria-label="Search patient" className="w-full bg-transparent px-1 text-[14px] text-gray-900 outline-none"
+                value={query} maxLength={80} placeholder="Search by patient ID, name or mobile number"
+                onChange={(e) => setQuery(e.target.value)} />
+              {query && <button type="button" className="px-2 text-[#64748B] hover:text-gray-900" onClick={clear}>✕</button>}
+              <button type="submit" disabled={busy || !query.trim()}
+                className="rounded-lg bg-[#1B4FD8] px-6 py-2 text-[13px] font-medium text-white hover:bg-[#1741B0] disabled:opacity-50">
+                {busy ? "Searching…" : "Search"}
+              </button>
+            </form>
           </div>
-          <form onSubmit={search} role="search" className="flex min-w-[320px] flex-1 gap-2 rounded-xl border border-[#CBD5E1] bg-white p-1.5 shadow-sm md:max-w-2xl">
-            <span aria-hidden className="flex items-center pl-2 text-[#64748B]">🔍</span>
-            <input aria-label="Search patient by ID, name or mobile number" autoFocus className="w-full bg-transparent px-1 text-[14px] text-gray-900 outline-none" value={query} maxLength={80}
-              placeholder="Search by patient ID, name or mobile number" onChange={(e) => setQuery(e.target.value)} />
-            {query && <button type="button" aria-label="Clear search" className="px-2 text-[#64748B] hover:text-gray-900" onClick={clear}>✕</button>}
-            <button type="submit" disabled={busy || !query.trim()} className="rounded-lg bg-[#1B4FD8] px-6 py-2 text-[13px] font-medium text-white hover:bg-[#1741B0] disabled:opacity-50">{busy ? "Searching…" : "Search"}</button>
-          </form>
+          {error && <ErrorBox error={error} onRetry={search} />}
+          <Profile key={openId} patientId={openId} navigate={navigate} onClose={() => { setOpenId(null); clear() }} />
+        </div>
+      </div>
+    )
+  }
+
+  // ── Hero landing page (no patient selected) ──
+  return (
+    <div className="flex-1 overflow-y-auto">
+      <div className="relative min-h-screen bg-gradient-to-br from-[#E8F0FE] via-[#EEF4FF] to-white overflow-hidden">
+
+        {/* Decorative "+" marks scattered in background */}
+        {[
+          { top: "8%",  left: "4%",  sz: 20, op: 0.18 },
+          { top: "20%", left: "48%", sz: 15, op: 0.12 },
+          { top: "55%", left: "2%",  sz: 14, op: 0.11 },
+          { top: "72%", left: "62%", sz: 18, op: 0.10 },
+          { top: "85%", left: "32%", sz: 12, op: 0.09 },
+          { top: "38%", left: "92%", sz: 16, op: 0.11 },
+        ].map((p, i) => (
+          <span key={i} aria-hidden style={{
+            position: "absolute", top: p.top, left: p.left,
+            fontSize: p.sz, opacity: p.op, color: "#1B4FD8",
+            fontWeight: 900, lineHeight: 1, userSelect: "none", pointerEvents: "none",
+          }}>+</span>
+        ))}
+
+        {/* Two-column hero */}
+        <div className="flex flex-col lg:flex-row min-h-[calc(100vh-56px)]">
+
+          {/* LEFT: title, tagline, pills, search */}
+          <div className="flex-1 flex flex-col justify-center px-8 py-10 lg:px-14 lg:py-16 max-w-2xl">
+
+            <h1 className="text-4xl lg:text-5xl font-bold text-[#1E3A6E] leading-tight tracking-tight">
+              Patient <span className="text-[#1B4FD8]">360°</span>
+            </h1>
+
+            <p className="mt-3 text-xl font-semibold text-[#1B4FD8]">
+              One patient. Complete view. Better care.
+            </p>
+
+            <p className="mt-3 text-[#475569] text-[13.5px] leading-relaxed max-w-md">
+              Get a unified view of your patient's journey — from registration to follow-up — with clinical data, care coordination and PatientReach AI.
+            </p>
+
+            {/* Feature pills */}
+            <div className="mt-7 flex flex-wrap gap-3">
+              {[
+                { icon: "🧑‍⚕️", label: "Unified Patient Profile" },
+                { icon: "📈",    label: "Clinical Timeline" },
+                { icon: "🤝",    label: "Care Coordination" },
+                { icon: "💬",    label: "PatientReach AI" },
+              ].map((f) => (
+                <div key={f.label} className="flex items-center gap-2 rounded-xl bg-white border border-[#DCE6FB] px-3.5 py-2.5 text-[12px] font-medium text-[#1E3A6E] shadow-sm">
+                  <span className="text-base" aria-hidden>{f.icon}</span>
+                  {f.label}
+                </div>
+              ))}
+            </div>
+
+            {/* Search bar */}
+            <form onSubmit={search} role="search"
+              className="mt-8 flex items-center gap-2 rounded-xl border border-[#CBD5E1] bg-white p-1.5 shadow-md max-w-lg">
+              <span aria-hidden className="flex items-center pl-2 text-[#94A3B8] text-lg">🔍</span>
+              <input
+                autoFocus
+                aria-label="Search patient by ID, name or mobile number"
+                className="w-full bg-transparent px-2 text-[14px] text-gray-900 outline-none placeholder:text-[#94A3B8]"
+                placeholder="Search by Patient ID, name or mobile number..."
+                value={query} maxLength={80}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              {query && (
+                <button type="button" className="px-2 text-[#64748B] hover:text-gray-900 text-sm" onClick={clear}>✕</button>
+              )}
+              <button type="submit" disabled={busy || !query.trim()}
+                className="flex items-center gap-1.5 rounded-lg bg-[#1B4FD8] px-5 py-2 text-[13px] font-semibold text-white hover:bg-[#1741B0] disabled:opacity-50 transition-colors">
+                {busy ? "Searching…" : <><span>Search</span><span aria-hidden className="text-base font-bold">›</span></>}
+              </button>
+            </form>
+
+            {/* Feedback / results */}
+            {error && <div className="mt-4"><ErrorBox error={error} onRetry={search} /></div>}
+
+            {!openId && matches && matches.length === 0 && (
+              <div className="mt-4"><Empty>No registered patient matches "{query.trim()}". Check the ID, name spelling or mobile number.</Empty></div>
+            )}
+
+            {!openId && matches && matches.length > 1 && (
+              <section className="mt-4 rounded-lg border border-[#DDE2EC] bg-white shadow-sm">
+                <header className="border-b border-[#EEF1F6] px-4 py-2 text-[12.5px] font-semibold">
+                  {total} patients match — choose one
+                  {total > matches.length ? ` (showing first ${matches.length}; refine to narrow)` : ""}
+                </header>
+                <ul className="divide-y divide-[#F1F5F9]">
+                  {matches.map((m) => (
+                    <li key={m.patient_id}>
+                      <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-[#EEF3FF]"
+                        onClick={() => { setOpenId(m.patient_id); setMatches(null) }}>
+                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#DCE6FB] text-[12px] font-bold text-[#1E3A6E]">{initials(m)}</span>
+                        <span className="flex-1">
+                          <span className="block text-[13px] font-medium text-gray-900">{fullName(m)}</span>
+                          <span className="block text-[11.5px] text-[#64748B]">{m.patient_id} · {m.age ?? "—"} yrs · {m.gender || "—"} · {m.phone || "no phone"}</span>
+                        </span>
+                        {m.admitted ? <Badge tone="blue">Admitted</Badge> : null}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+          </div>
+
+          {/* RIGHT: Circular data-source diagram */}
+          <div className="flex-1 flex items-center justify-center p-8 relative">
+            <div style={{ position: "relative", width: 320, height: 320 }}>
+              {/* Dashed orbit ring */}
+              <div style={{
+                position: "absolute", inset: 0, borderRadius: "50%",
+                border: "1.5px dashed #93C5FD", opacity: 0.5,
+              }} />
+              {/* Inner ring */}
+              <div style={{
+                position: "absolute", inset: 24, borderRadius: "50%",
+                border: "1px solid #BFDBFE", opacity: 0.5,
+              }} />
+
+              {/* Center avatar */}
+              <div style={{
+                position: "absolute", top: "50%", left: "50%",
+                transform: "translate(-50%,-50%)",
+                width: 72, height: 72, borderRadius: "50%",
+                background: "linear-gradient(135deg,#1B4FD8 0%,#3B6EF0 100%)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 4px 20px rgba(27,79,216,0.35)",
+                zIndex: 10, fontSize: 32,
+              }}>🧑‍⚕️</div>
+
+              {/* SVG lines from center to nodes */}
+              <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+                {DATA_NODES.map((node) => {
+                  const rad = (node.angle * Math.PI) / 180
+                  const r = 148, cx = 160 + r * Math.sin(rad), cy = 160 - r * Math.cos(rad)
+                  const dx = cx - 160, dy = cy - 160, dist = Math.sqrt(dx * dx + dy * dy)
+                  const cr = 36
+                  return (
+                    <line key={node.label}
+                      x1={160 + (cr / dist) * dx} y1={160 + (cr / dist) * dy}
+                      x2={cx - (22 / dist) * dx} y2={cy - (22 / dist) * dy}
+                      stroke="#93C5FD" strokeWidth={1} strokeDasharray="3 3" opacity={0.7} />
+                  )
+                })}
+              </svg>
+
+              {/* Node cards */}
+              {DATA_NODES.map((node) => {
+                const rad = (node.angle * Math.PI) / 180
+                const r = 148
+                return (
+                  <div key={node.label} style={{
+                    position: "absolute",
+                    left: 160 + r * Math.sin(rad),
+                    top: 160 - r * Math.cos(rad),
+                    transform: "translate(-50%,-50%)",
+                    zIndex: 5,
+                  }}>
+                    <div style={{
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+                      background: "white", border: "1.5px solid #DCE6FB", borderRadius: 12,
+                      padding: "6px 10px", boxShadow: "0 2px 8px rgba(27,79,216,0.10)",
+                      minWidth: 70, textAlign: "center",
+                    }}>
+                      <span style={{ fontSize: 20 }} aria-hidden>{node.icon}</span>
+                      <span style={{ fontSize: 9.5, fontWeight: 600, color: "#1E3A6E", lineHeight: 1.3, whiteSpace: "nowrap" }}>{node.label}</span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
 
-        {error && <ErrorBox error={error} onRetry={search} />}
-
-        {matches && matches.length === 0 && <Empty>No registered patient matches “{query.trim()}”. Check the ID, name spelling or mobile number.</Empty>}
-
-        {matches && matches.length > 1 && (
-          <section className="rounded-lg border border-[#DDE2EC] bg-white shadow-sm">
-            <header className="border-b border-[#EEF1F6] px-4 py-2 text-[12.5px] font-semibold">{total} patients match — choose one{total > matches.length ? ` (showing first ${matches.length}; refine the search to narrow)` : ""}</header>
-            <ul className="divide-y divide-[#F1F5F9]">
-              {matches.map((m) => (
-                <li key={m.patient_id}>
-                  <button className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-[#EEF3FF]" onClick={() => setOpenId(m.patient_id)}>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#DCE6FB] text-[12px] font-bold text-[#1E3A6E]">{initials(m)}</span>
-                    <span className="flex-1"><span className="block text-[13px] font-medium text-gray-900">{fullName(m)}</span><span className="block text-[11.5px] text-[#64748B]">{m.patient_id} · {m.age ?? "—"} yrs · {m.gender || "—"} · {m.phone || "no phone"}</span></span>
-                    {m.admitted ? <Badge tone="blue">Admitted</Badge> : null}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {openId && <Profile key={openId} patientId={openId} navigate={navigate} onClose={() => { setOpenId(null); if (!matches) clear() }} />}
-
-        {!openId && !matches && !error && !busy && (
-          <div className="rounded-xl border border-dashed border-[#CBD5E1] bg-white px-4 py-14 text-center text-[13px] text-[#64748B]">
-            <div className="mb-2 text-3xl" aria-hidden>🔎</div>Enter a patient ID, name or mobile number above to load the full Patient 360° profile.
-          </div>
-        )}
+        {/* Footer bar */}
+        <div className="border-t border-[#DCE6FB] bg-white/80 backdrop-blur-sm px-8 py-3 flex items-center justify-between text-[12px] text-[#475569]">
+          <span className="flex items-center gap-2">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1B4FD8] text-white text-[10px] font-bold">✓</span>
+            Better Patient Engagement.&nbsp;&nbsp;Smarter Care Coordination.&nbsp;&nbsp;Improved Health Outcomes.
+          </span>
+          <span className="flex items-center gap-1.5 font-semibold text-[#1B4FD8]">
+            <span className="rounded bg-[#1B4FD8] text-white px-1.5 py-0.5 text-[10px] font-bold leading-none">H</span>
+            Powered by HospAi
+          </span>
+        </div>
       </div>
     </div>
   )

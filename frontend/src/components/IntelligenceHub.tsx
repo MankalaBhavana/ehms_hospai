@@ -46,6 +46,14 @@ const AI_MODULES = [
     color: "#0284C7",
     metric: "Qwen-powered",
   },
+  {
+    id: "patient360_search",
+    title: "Patient 360°",
+    desc: "Search any patient by ID, name or mobile number and open their full profile: encounters, medications, labs, care journey, tasks and consent in one place.",
+    icon: <Icon.Search />,
+    color: "#0F766E",
+    metric: "Care coordination",
+  },
 ]
 
 export default function IntelligenceHub({ navigate }: IntelligenceHubProps) {

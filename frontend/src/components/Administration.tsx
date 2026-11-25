@@ -86,6 +86,7 @@ export const ALL_ADMIN_ASSIGNABLE_MODULES: Array<{
   { key: "laboratory", label: "Laboratory Diagnostics", category: "Diagnostics", icon: "🧪" },
   { key: "radiology", label: "Radiology & Imaging", category: "Diagnostics", icon: "🩻" },
   { key: "pharmacy", label: "Pharmacy & Dispensary", category: "Pharmacy", icon: "💊" },
+  { key: "patient360", label: "Patient 360° Care Coordination", category: "Management", icon: "🧭" },
   { key: "billing", label: "Billing & Cash Counter", category: "Finance", icon: "💳" },
   { key: "insurance", label: "Insurance & TPA Claims", category: "Finance", icon: "🛡️" },
   { key: "accounts", label: "Accounts & General Ledger", category: "Finance", icon: "🏦" },

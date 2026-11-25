@@ -23,6 +23,7 @@ import re
 import base64
 import hashlib
 import hmac
+import logging
 from datetime import date, datetime
 from functools import wraps
 from urllib import error as urllib_error
@@ -207,6 +208,9 @@ from utils.database import (
 
 BASE_DIR = os.path.dirname(__file__)
 STORAGE = ObjectStorage()
+# Used by the startup seeding below, which previously referenced this name without defining it (a NameError that
+# hid the real "first administrator could not be created" error).
+logger = logging.getLogger(__name__)
 
 from core.celery_app import celery_init_app
 
@@ -680,6 +684,9 @@ app.register_blueprint(queue_bp)
 
 from modules.doctor_availability.routes import doctor_availability_bp
 app.register_blueprint(doctor_availability_bp)
+
+from modules.patient360.routes import patient360_bp
+app.register_blueprint(patient360_bp)
 
 
 @app.errorhandler(DatabaseBusy)

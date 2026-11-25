@@ -525,6 +525,11 @@ def init_database():
         ensure_admin_tables(conn)
         ensure_doctor_availability_tables(conn)
 
+        # Patient 360 coordination tables (modules/patient360). Imported here for the same reason as the GL below.
+        from modules.patient360.schema import ensure_patient360_tables
+
+        ensure_patient360_tables(conn)
+
         # General ledger (billing-service's accounts module). Imported here, not at
         # module top, so utils.database keeps no import-time dependency on modules/.
         from modules.accounts.schema import ensure_gl_tables

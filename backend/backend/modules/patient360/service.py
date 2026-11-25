@@ -94,7 +94,7 @@ def _vitals(cur, pid):
     when = "recorded_at" if _has_col(cur, "patient_vitals", "recorded_at") else "created_at"
     extra = [c for c in ("spo2", "respiratory_rate", "blood_glucose", "weight", "height") if _has_col(cur, "patient_vitals", c)]
     cols = ", ".join(["id", "bp", "pulse", "temperature"] + extra)
-    return _all(cur, f"SELECT {cols}, {when} AS created_at FROM patient_vitals WHERE patient_id = ? ORDER BY {when} DESC LIMIT 5", (pid,))
+    return _all(cur, f"SELECT {cols}, {when} AS created_at FROM patient_vitals WHERE patient_id = ? ORDER BY {when} DESC LIMIT 30", (pid,))
 
 
 # ── Registry ────────────────────────────────────────────────────────────────────────────────────
@@ -226,6 +226,7 @@ def get_profile(hospital_id, patient_id):
             SELECT body, created_at, kind
             FROM patient_messages
             WHERE hospital_id = ? AND patient_id = ? AND channel = 'whatsapp'
+              AND kind = 'symptoms'  -- only what the patient reported, never the hospital's own outbound messages
               AND body IS NOT NULL AND body <> ''
             ORDER BY created_at DESC LIMIT 1
             """,
@@ -264,14 +265,14 @@ def get_profile(hospital_id, patient_id):
         r.update(_source("appointments", "appointment", r.get("id")))
 
     whatsapp_symptom_text = (
-        (whatsapp_fb.get("comment") if whatsapp_fb else None)
-        or (whatsapp_msg.get("body") if whatsapp_msg else None)
+        (whatsapp_msg.get("body") if whatsapp_msg else None)
         or patient.get("symptoms")
         or (encounters[0].get("symptoms") if encounters and encounters[0].get("symptoms") else None)
+        or (whatsapp_fb.get("comment") if whatsapp_fb else None)
     )
     whatsapp_symptom_at = (
-        (whatsapp_fb.get("received_at") if whatsapp_fb else None)
-        or (whatsapp_msg.get("created_at") if whatsapp_msg else None)
+        (whatsapp_msg.get("created_at") if whatsapp_msg else None)
+        or (whatsapp_fb.get("received_at") if whatsapp_fb else None)
         or patient.get("updated_at")
     )
     whatsapp_symptoms = {

@@ -200,9 +200,7 @@ export function ClinicalTab({ d }: { d: Row }) {
       <Card title="Diagnosis history">
         {d.diagnoses.length ? <Table head={["Diagnosis", "Recorded", "Source"]}>{d.diagnoses.map((x: Row) => <tr key={x.id}><td className="px-2 py-1.5">{x.diagnosis_name}</td><td className="px-2 py-1.5">{fmtDate(x.created_at)}</td><td className="px-2 py-1.5 text-[10.5px] text-[#94A3B8]">{x.source_module} · {pretty(x.verification_state)}</td></tr>)}</Table> : <p className="text-[12px] text-[#64748B]">None recorded.</p>}
       </Card>
-      <Card title="Vitals history" className="md:col-span-2">
-        {d.vitals.length ? <Table head={["When", "BP", "Pulse", "Temperature"]}>{d.vitals.map((v: Row) => <tr key={v.id}><td className="px-2 py-1.5">{fmtDateTime(v.created_at)}</td><td className="px-2 py-1.5">{v.bp || "—"}</td><td className="px-2 py-1.5">{v.pulse || "—"}</td><td className="px-2 py-1.5">{v.temperature || "—"}</td></tr>)}</Table> : <p className="text-[12px] text-[#64748B]">None recorded.</p>}
-      </Card>
+      <p className="text-[11px] text-[#94A3B8] md:col-span-2">Vitals history and trends are on the Vitals tab.</p>
     </div>
   )
 }

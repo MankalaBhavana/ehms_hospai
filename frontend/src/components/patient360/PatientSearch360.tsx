@@ -5,13 +5,15 @@ import { ClinicalTab, CommsTab, ConsentTab, EncountersTab, JourneyTab, Medicatio
 import TasksView from "./TasksView"
 import { Badge, btnCls, Card, cx, Empty, ErrorBox, errMsg, fmtDate, fmtDateTime, fullName, inputCls, Loading, pretty, Table, useAsync } from "./ui"
 
-type Tab = "overview" | "timeline" | "clinical" | "encounters" | "medications" | "labs" | "appointments" | "journey" | "surveys" | "communications" | "tasks" | "documents" | "consent"
+type Tab = "overview" | "timeline" | "clinical" | "vitals" | "care_team" | "billing" | "encounters" | "medications" | "labs" | "appointments" | "journey" | "surveys" | "communications" | "tasks" | "documents" | "consent"
 
 const TABS: Array<{ key: Tab; label: string; icon: string }> = [
   { key: "overview", label: "Overview", icon: "🏠" },
   { key: "timeline", label: "Timeline", icon: "🕒" },
   { key: "clinical", label: "Clinical", icon: "📋" },
+  { key: "vitals", label: "Vitals", icon: "❤️" },
   { key: "encounters", label: "Encounters", icon: "🩺" },
+  { key: "care_team", label: "Care Team", icon: "👥" },
   { key: "medications", label: "Medications", icon: "💊" },
   { key: "labs", label: "Labs & Imaging", icon: "🧪" },
   { key: "appointments", label: "Appointments", icon: "📅" },
@@ -19,6 +21,7 @@ const TABS: Array<{ key: Tab; label: string; icon: string }> = [
   { key: "surveys", label: "Surveys", icon: "📝" },
   { key: "communications", label: "Communications", icon: "💬" },
   { key: "tasks", label: "Tasks", icon: "✅" },
+  { key: "billing", label: "Billing & Insurance", icon: "💳" },
   { key: "documents", label: "Documents", icon: "📄" },
   { key: "consent", label: "Consent & Audit", icon: "🔒" },
 ]
@@ -229,19 +232,160 @@ function MoreVisits({ d }: { d: Row }) {
           {d.surgeries.length ? <Table head={["Procedure", "Surgeon", "Scheduled", "Status"]}>{d.surgeries.map((x: Row) => <tr key={x.id}><td className="px-2 py-1.5">{x.procedure_name}</td><td className="px-2 py-1.5">{x.surgeon_name || "—"}</td><td className="px-2 py-1.5">{fmtDateTime(x.scheduled_start)}</td><td className="px-2 py-1.5"><Badge status={x.status} /></td></tr>)}</Table> : <p className="text-[12px] text-[#64748B]">None.</p>}
         </Card>
       </div>
-      <Card title="Billing & insurance">
-        {d.invoices.length ? <Table head={["Invoice", "Module", "Total", "Paid", "Due", "Status"]}>{d.invoices.map((i: Row) => <tr key={i.id}><td className="px-2 py-1.5">{i.invoice_no}</td><td className="px-2 py-1.5">{pretty(i.module)}</td><td className="px-2 py-1.5">{money(i.total_amount)}</td><td className="px-2 py-1.5">{money(i.paid_amount)}</td><td className="px-2 py-1.5">{money(i.due_amount)}</td><td className="px-2 py-1.5"><Badge status={i.payment_status} /></td></tr>)}</Table> : <p className="text-[12px] text-[#64748B]">No invoices.</p>}
-        {d.claims.length > 0 && <div className="mt-3"><Table head={["Insurer", "Claim", "Approved", "Status"]}>{d.claims.map((c: Row) => <tr key={c.id}><td className="px-2 py-1.5">{c.insurer_name || "—"}</td><td className="px-2 py-1.5">{money(c.claim_amount)}</td><td className="px-2 py-1.5">{money(c.approved_amount)}</td><td className="px-2 py-1.5"><Badge status={c.claim_status} /></td></tr>)}</Table></div>}
+    </div>
+  )
+}
+
+const num = (v: any) => { const n = parseFloat(String(v ?? "").replace(/[^\d.]/g, "")); return Number.isFinite(n) ? n : null }
+
+function Spark({ title, unit, pts, color }: { title: string; unit: string; pts: Array<{ at: string; v: number }>; color: string }) {
+  const W = 220, H = 56, P = 4
+  const vs = pts.map((p) => p.v), lo = Math.min(...vs), hi = Math.max(...vs), span = hi - lo || 1
+  const xy = pts.map((p, i) => [P + (pts.length === 1 ? (W - 2 * P) / 2 : (i * (W - 2 * P)) / (pts.length - 1)), H - P - ((p.v - lo) / span) * (H - 2 * P)])
+  const last = pts[pts.length - 1]
+  return (
+    <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+      <div className="flex items-baseline justify-between"><span className="text-[11.5px] font-medium text-[#475569]">{title}</span><span className="text-[15px] font-semibold text-gray-900">{last.v}<span className="ml-0.5 text-[10.5px] font-normal text-[#94A3B8]">{unit}</span></span></div>
+      {pts.length > 1 ? (
+        <svg viewBox={`0 0 ${W} ${H}`} className="mt-1 h-14 w-full" role="img" aria-label={`${title} trend`}>
+          <polyline points={xy.map((q) => q.join(",")).join(" ")} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+          {xy.map((q, i) => <circle key={i} cx={q[0]} cy={q[1]} r="2.5" fill={color}><title>{`${pts[i].v} ${unit} · ${fmtDateTime(pts[i].at)}`}</title></circle>)}
+        </svg>
+      ) : <p className="mt-2 text-[10.5px] text-[#94A3B8]">Only one reading so far.</p>}
+      <div className="flex justify-between text-[10px] text-[#94A3B8]"><span>{pts.length > 1 ? `min ${lo} · max ${hi}` : ""}</span><span>{fmtDate(last.at)}</span></div>
+    </div>
+  )
+}
+
+function VitalsTab({ d }: { d: Row }) {
+  const rows: Row[] = [...d.vitals].reverse() // oldest → newest for the charts
+  const series = (get: (v: Row) => number | null) => rows.map((v) => ({ at: v.created_at, v: get(v) })).filter((p): p is { at: string; v: number } => p.v !== null)
+  const sys = (v: Row) => num(String(v.bp ?? "").split("/")[0])
+  const dia = (v: Row) => num(String(v.bp ?? "").split("/")[1])
+  const charts = [
+    { title: "Systolic BP", unit: "mmHg", color: "#DC2626", pts: series(sys) },
+    { title: "Diastolic BP", unit: "mmHg", color: "#F97316", pts: series(dia) },
+    { title: "Pulse", unit: "bpm", color: "#2563EB", pts: series((v) => num(v.pulse)) },
+    { title: "Temperature", unit: "°", color: "#D97706", pts: series((v) => num(v.temperature)) },
+    { title: "SpO₂", unit: "%", color: "#0891B2", pts: series((v) => num(v.spo2)) },
+    { title: "Blood glucose", unit: "mg/dL", color: "#7C3AED", pts: series((v) => num(v.blood_glucose)) },
+    { title: "Weight", unit: "kg", color: "#059669", pts: series((v) => num(v.weight)) },
+  ].filter((c) => c.pts.length)
+  if (!d.vitals.length) return <Card title="Vitals"><Empty>No vitals recorded.</Empty></Card>
+  return (
+    <div className="space-y-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{charts.map((c) => <Spark key={c.title} {...c} />)}</div>
+      <Card title="Vitals history">
+        <Table head={["When", "BP", "Pulse", "Temp", "SpO₂", "Glucose", "Weight"]}>
+          {d.vitals.map((v: Row) => <tr key={v.id}><td className="px-2 py-1.5">{fmtDateTime(v.created_at)}</td><td className="px-2 py-1.5">{v.bp || "—"}</td><td className="px-2 py-1.5">{v.pulse || "—"}</td><td className="px-2 py-1.5">{v.temperature || "—"}</td><td className="px-2 py-1.5">{v.spo2 ?? "—"}</td><td className="px-2 py-1.5">{v.blood_glucose ?? "—"}</td><td className="px-2 py-1.5">{v.weight ?? "—"}</td></tr>)}
+        </Table>
       </Card>
+    </div>
+  )
+}
+
+/** Everyone who has treated this patient, derived from records already loaded (no new data source). */
+function CareTeam({ d }: { d: Row }) {
+  const team = new Map<string, { name: string; dept: Set<string>; roles: Set<string>; n: number; last: string }>()
+  const add = (name: any, dept: any, role: string, at: any) => {
+    const nm = String(name || "").trim()
+    if (!nm) return
+    const t = team.get(nm.toLowerCase()) || { name: nm, dept: new Set<string>(), roles: new Set<string>(), n: 0, last: "" }
+    if (dept) t.dept.add(String(dept))
+    t.roles.add(role); t.n++
+    if (at && (!t.last || +new Date(at) > +new Date(t.last))) t.last = String(at)
+    team.set(nm.toLowerCase(), t)
+  }
+  d.appointments.forEach((a: Row) => add(a.doctor_name, a.department, "Consultant", a.appointment_date))
+  d.encounters.forEach((e: Row) => add(e.attending_doctor || e.doctor_name, e.department, "Attending", e.arrival_at))
+  d.admissions.forEach((a: Row) => add(a.attending_doctor, a.department, "Attending (IP)", a.admission_date))
+  d.er_visits.forEach((v: Row) => add(v.assigned_doctor_name, v.assigned_specialty, "Emergency", v.arrival_at))
+  d.surgeries.forEach((s: Row) => add(s.surgeon_name, "Surgery", "Surgeon", s.scheduled_start))
+  d.investigations.forEach((x: Row) => add(x.doctor_name, x.department, "Ordering doctor", x.created_at))
+  const list = [...team.values()].sort((a, b) => b.n - a.n)
+  return (
+    <Card title="Care team">
+      {list.length ? (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map((t) => (
+            <div key={t.name} className="flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-white p-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#DCE6FB] text-[12px] font-bold text-[#1E3A6E]">{initials({ name: t.name })}</span>
+              <div className="min-w-0 text-[12px]">
+                <div className="truncate text-[13px] font-semibold text-gray-900">{t.name}</div>
+                <div className="text-[#64748B]">{[...t.dept].join(", ") || "—"}</div>
+                <div className="mt-1 flex flex-wrap gap-1">{[...t.roles].map((r) => <Badge key={r} tone="blue">{r}</Badge>)}</div>
+                <div className="mt-1 text-[10.5px] text-[#94A3B8]">{t.n} record{t.n > 1 ? "s" : ""} · last {fmtDate(t.last)}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : <Empty>No treating clinicians on record yet.</Empty>}
+    </Card>
+  )
+}
+
+function BillingTab({ d }: { d: Row }) {
+  const sum = (k: string) => d.invoices.reduce((n: number, i: Row) => n + Number(i[k] || 0), 0)
+  const claimed = d.claims.reduce((n: number, c: Row) => n + Number(c.claim_amount || 0), 0)
+  const approved = d.claims.reduce((n: number, c: Row) => n + Number(c.approved_amount || 0), 0)
+  const stat = (l: string, v: string, warn = false) => <div className="rounded-lg bg-[#EEF3FF] px-3 py-2"><div className="text-[11px] text-[#64748B]">{l}</div><div className={cx("text-[16px] font-semibold", warn ? "text-[#B91C1C]" : "text-[#1E3A6E]")}>{v}</div></div>
+  const invNo = (id: any) => d.invoices.find((i: Row) => i.id === id)?.invoice_no
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        {stat("Billed", money(sum("total_amount")))}{stat("Paid", money(sum("paid_amount")))}{stat("Outstanding", money(sum("due_amount")), sum("due_amount") > 0)}{stat("Claimed", money(claimed))}{stat("Approved", money(approved))}
+      </div>
+      <Card title="Invoices">
+        {d.invoices.length ? <Table head={["Invoice", "Module", "Date", "Total", "Paid", "Due", "Status"]}>{d.invoices.map((i: Row) => <tr key={i.id}><td className="px-2 py-1.5">{i.invoice_no}</td><td className="px-2 py-1.5">{pretty(i.module)}</td><td className="px-2 py-1.5">{fmtDate(i.created_at)}</td><td className="px-2 py-1.5">{money(i.total_amount)}</td><td className="px-2 py-1.5">{money(i.paid_amount)}</td><td className="px-2 py-1.5">{money(i.due_amount)}</td><td className="px-2 py-1.5"><Badge status={i.payment_status} /></td></tr>)}</Table> : <Empty>No invoices.</Empty>}
+      </Card>
+      <Card title="Insurance claims">
+        {d.claims.length ? <Table head={["Insurer", "Invoice", "Submitted", "Claimed", "Approved", "Shortfall", "Status"]}>{d.claims.map((c: Row) => { const gap = c.approved_amount == null ? null : Number(c.claim_amount || 0) - Number(c.approved_amount || 0); return <tr key={c.id}><td className="px-2 py-1.5">{c.insurer_name || "—"}</td><td className="px-2 py-1.5">{invNo(c.invoice_id) || "—"}</td><td className="px-2 py-1.5">{c.submitted_at ? fmtDate(c.submitted_at) : "—"}</td><td className="px-2 py-1.5">{money(c.claim_amount)}</td><td className="px-2 py-1.5">{money(c.approved_amount)}</td><td className={cx("px-2 py-1.5", gap !== null && gap > 0 && "text-[#B91C1C]")}>{gap === null ? "—" : money(gap)}</td><td className="px-2 py-1.5"><Badge status={c.claim_status} /></td></tr> })}</Table> : <Empty>No insurance claims.</Empty>}
+      </Card>
+    </div>
+  )
+}
+
+/** Critical flags pinned in the profile header, all derived from the loaded profile. */
+function AlertsStrip({ d, admitted }: { d: Row; admitted: boolean }) {
+  const allergy = d.patient.allergies || d.clinical_history?.allergies
+  const due = d.invoices.reduce((n: number, i: Row) => n + Number(i.due_amount || 0), 0)
+  const overdue = d.checkpoints.filter((c: Row) => c.status === "overdue").length
+  const bed = d.beds.find((b: Row) => !b.released_at)
+  const flags: Array<{ tone: string; text: string }> = [
+    allergy && { tone: "border-red-300 bg-red-50 text-red-800", text: `⚠ Allergies: ${allergy}` },
+    admitted && { tone: "border-blue-200 bg-blue-50 text-blue-800", text: `🛏 Admitted${bed ? ` · ${bed.ward || "Ward"} ${bed.bed_no || ""}` : ""}` },
+    due > 0 && { tone: "border-amber-300 bg-amber-50 text-amber-900", text: `💳 Outstanding ${money(due)}` },
+    overdue > 0 && { tone: "border-amber-300 bg-amber-50 text-amber-900", text: `⏰ ${overdue} overdue checkpoint${overdue > 1 ? "s" : ""}` },
+  ].filter(Boolean) as Array<{ tone: string; text: string }>
+  if (!flags.length) return null
+  return <div role="alert" className="mt-3 flex flex-wrap gap-2">{flags.map((f) => <span key={f.text} className={cx("rounded-md border px-2.5 py-1 text-[12px] font-medium", f.tone)}>{f.text}</span>)}</div>
+}
+
+function FollowUpSummary({ d }: { d: Row }) {
+  const now = Date.now()
+  const lastDischarge = d.admissions.filter((a: Row) => a.discharge_date).sort((a: Row, b: Row) => +new Date(b.discharge_date) - +new Date(a.discharge_date))[0]
+  const upcoming = d.appointments.filter((a: Row) => ["scheduled", "checked_in", "confirmed", "booked", "pending"].includes(a.status) && +new Date(a.appointment_date) >= now - 864e5)
+  const missed = d.appointments.filter((a: Row) => ["no_show", "missed", "cancelled"].includes(String(a.status).toLowerCase()) || (["scheduled", "booked", "pending"].includes(a.status) && +new Date(a.appointment_date) < now - 864e5))
+  const pending = d.checkpoints.filter((c: Row) => ["scheduled", "queued", "overdue"].includes(c.status))
+  const box = (title: string, tone: string, body: React.ReactNode) => <div className={cx("rounded-lg border p-3 text-[12px]", tone)}><div className="mb-1 text-[11px] font-semibold uppercase tracking-wide opacity-70">{title}</div>{body}</div>
+  return (
+    <div className="mb-3 grid gap-3 md:grid-cols-4">
+      {box("Last discharge", "border-[#DDE2EC] bg-white", lastDischarge ? <><div className="font-semibold text-gray-900">{fmtDate(lastDischarge.discharge_date)}</div><div className="text-[#64748B]">{lastDischarge.discharge_diagnosis || lastDischarge.diagnosis || "Admitted " + fmtDate(lastDischarge.admission_date)}</div></> : <span className="text-[#64748B]">No discharge on record.</span>)}
+      {box("Upcoming", "border-blue-200 bg-blue-50", upcoming.length ? <><div className="text-[18px] font-semibold text-[#1E3A6E]">{upcoming.length}</div><div className="text-[#475569]">Next: {fmtDateTime(upcoming[upcoming.length - 1].appointment_date)}</div></> : <span className="text-[#64748B]">Nothing scheduled.</span>)}
+      {box("Missed / cancelled", missed.length ? "border-amber-300 bg-amber-50" : "border-[#DDE2EC] bg-white", <div className={cx("text-[18px] font-semibold", missed.length ? "text-amber-900" : "text-gray-900")}>{missed.length}</div>)}
+      {box("Pending follow-up steps", pending.length ? "border-amber-300 bg-amber-50" : "border-[#DDE2EC] bg-white", pending.length ? <><div className="text-[18px] font-semibold text-amber-900">{pending.length}</div><div className="truncate text-[#475569]">Next: {pending[0].label}</div></> : <span className="text-[#64748B]">None pending.</span>)}
     </div>
   )
 }
 
 function Appointments({ d }: { d: Row }) {
   return (
+    <>
+    <FollowUpSummary d={d} />
     <Card title="Appointments (read from the scheduler)">
       {d.appointments.length ? <Table head={["When", "Department", "Doctor", "Type", "Token", "Status", "Consultation"]}>{d.appointments.map((a: Row) => <tr key={a.id} className="align-top"><td className="px-2 py-1.5">{fmtDateTime(a.appointment_date)}</td><td className="px-2 py-1.5">{a.department || "—"}</td><td className="px-2 py-1.5">{a.doctor_name || "—"}</td><td className="px-2 py-1.5">{a.visit_type}</td><td className="px-2 py-1.5">{a.token_no ?? "—"}</td><td className="px-2 py-1.5"><Badge status={a.status} /></td><td className="px-2 py-1.5 text-[11.5px]">{a.chief_complaint && <div>Complaint: {a.chief_complaint}</div>}{a.diagnosis && <div>Dx: {a.diagnosis}</div>}{a.medicines && <div>Rx: {typeof a.medicines === "string" ? a.medicines : JSON.stringify(a.medicines)}</div>}{a.advice && <div>Advice: {a.advice}</div>}{a.follow_up_date && <div>Follow-up: {fmtDate(a.follow_up_date)}</div>}{!a.chief_complaint && !a.diagnosis && !a.medicines && !a.advice && "—"}</td></tr>)}</Table> : <Empty>No appointments.</Empty>}
     </Card>
+    </>
   )
 }
 
@@ -360,7 +504,14 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
             <button className={btnCls.ghost} onClick={onClose}>✕ Close</button>
           </div>
         </div>
-        {(p.allergies || d.clinical_history?.allergies) && <p className="mt-3 rounded border border-[#FDE68A] bg-[#FFFBEB] px-2 py-1 text-[12px] text-[#92400E]">Allergies: {p.allergies || d.clinical_history?.allergies}</p>}
+        <AlertsStrip d={d} admitted={admitted} />
+        <div className="mt-3 flex flex-wrap gap-2 border-t border-[#EEF1F6] pt-3">
+          <span className="self-center text-[11px] font-semibold uppercase tracking-wide text-[#94A3B8]">Quick actions</span>
+          <button className={btnCls.ghost} onClick={() => navigate("patient_messages")}>💬 Send message</button>
+          <button className={btnCls.ghost} onClick={() => navigate("appointments")}>📅 Book appointment</button>
+          <button className={btnCls.ghost} onClick={() => setShowTask(true)}>✅ Create task</button>
+          <button className={btnCls.ghost} onClick={() => setTab("consent")}>🔒 Consent</button>
+        </div>
       </section>
 
       <nav role="tablist" className="flex gap-1.5 overflow-x-auto rounded-xl border border-[#DDE2EC] bg-white p-1.5 shadow-sm">
@@ -375,6 +526,9 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
       {tab === "overview" && <Overview d={d} go={setTab} />}
       {tab === "timeline" && <TimelineTab patientId={p.patient_id} />}
       {tab === "clinical" && <ClinicalTab d={d} />}
+      {tab === "vitals" && <VitalsTab d={d} />}
+      {tab === "care_team" && <CareTeam d={d} />}
+      {tab === "billing" && <BillingTab d={d} />}
       {tab === "encounters" && <><EncountersTab d={d} /><MoreVisits d={d} /></>}
       {tab === "medications" && <MedicationsTab d={d} />}
       {tab === "labs" && <Labs d={d} />}

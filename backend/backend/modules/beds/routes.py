@@ -372,6 +372,14 @@ def beds_release(bed_id):
     if not released:
         return jsonify({"error": "This bed doesn't have an active patient assigned."}), 400
     log_audit_event("release", "bed_allocations", str(bed_id))
+    # Patient 360: a finalized discharge becomes a follow-up enrollment (idempotent on the discharge event). This is a
+    # side effect of the discharge, never a condition of it -- any failure is logged and the discharge stands.
+    try:
+        from modules.patient360.service import enroll_from_discharge
+
+        enroll_from_discharge(hospital_id, bed_id=bed_id, actor=g.current_user.get("username"))
+    except Exception:
+        logging.getLogger(__name__).exception("patient360 enrollment after discharge failed (bed %s)", bed_id)
     return jsonify({"success": True})
 
 

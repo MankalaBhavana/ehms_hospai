@@ -115,6 +115,7 @@ const NAVIGATION_MODULE_ALIASES: Record<string, string[]> = {
   insurance: ["insurance", "insurance_overview", "insurance_patient_policies", "insurance_eligibility", "insurance_preauth", "insurance_claims", "insurance_emails", "insurance_settlement", "insurance_gaps", "insurance_masters", "insurance_docrules"],
   hrms: ["hrms", "employees", "hr_attendance", "scheduling", "hr_staffing", "hr_leave", "hr_approvals", "hr_payroll", "hr_recruitment", "hr_organization", "hr_training", "hr_performance", "hr_compliance", "hr_grievances", "hr_reports", "hr_announcements", "my_hr"],
   patient_experience: ["patient_exp", "patient_messages"],
+  patient360: ["patient360", "patient360_search"],
   reports: [
     "reports", "reports_overview", "reports_patients", "reports_op", "reports_er",
     "reports_inpatient", "reports_appointments", "reports_doctors", "reports_pharmacy",

@@ -235,8 +235,28 @@ def send_patient_message():
     status_callback = _status_callback_url()
     template_sid = _template_sids().get(kind)
 
+    from modules.patient360.service import is_opted_out
+
+    purpose = {"feedback_request": "survey", "appointment_booked": "appointment_reminder"}.get(kind, "clinical_followup")
     results = []
     for channel in channels:
+        # Honour an explicit opt-out recorded in Patient 360 (a STOP reply or staff-recorded withdrawal). Patients with
+        # no record are unaffected, so existing desk workflows behave exactly as before.
+        if patient_id and is_opted_out(hospital_id, patient_id, channel, purpose):
+            results.append(
+                {
+                    "channel": channel,
+                    "status": "blocked_opted_out",
+                    "id": None,
+                    "provider_sid": None,
+                    "error": "This patient has opted out of this channel.",
+                    "error_code": "opted_out",
+                    "hint": "Opt-out recorded in Patient 360. Contact the patient another way, or have the opt-out reviewed.",
+                    "document_attached": False,
+                    "template": False,
+                }
+            )
+            continue
         body = render_body(message, link, document_title, channel)
         if channel == "sms":
             outcome = sms_provider.deliver_sms(phone, body, status_callback=status_callback)

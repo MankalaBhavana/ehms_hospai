@@ -115,6 +115,12 @@ const BACKEND_GRANTS: Record<string, Rule> = {
   "employees.access": ["employees"],
   patient_experience: ["patient_messages"],
   "patient_experience.feedback": ["patient_messages"],
+  // Patient 360: the bare grant is the whole workspace; each sub-grant implies it (the server enforces the write actions).
+  patient360: ["patient360", "patient360_search"],
+  "patient360.coordination": ["patient360", "patient360_search"],
+  "patient360.consent": ["patient360", "patient360_search"],
+  "patient360.approvals": ["patient360", "patient360_search"],
+  "patient360.segments": ["patient360", "patient360_search"],
 }
 // every hrms.* sub-grant opens the HR workspace
 BACKEND_GRANTS["hrms.audit"] = ["hrms", "employees", "hr_compliance", "hr_reports"]
@@ -123,7 +129,7 @@ for (const sub of ["departments", "attendance", "payroll", "leaves", "shifts", "
   BACKEND_GRANTS[`hrms.${sub}`] = ["hrms", "employees", ...(sub === "attendance" ? ["hr_attendance"] : []), ...(sub === "payroll" ? ["hr_payroll"] : []), ...(sub === "leaves" ? ["hr_leave"] : []), ...(sub === "recruitment" ? ["hr_recruitment"] : []), ...(sub === "training" ? ["hr_training"] : []), ...(sub === "performance" ? ["hr_performance"] : []), ...(sub === "grievances" ? ["hr_grievances"] : []), ...(sub === "reports" ? ["hr_reports"] : [])]
 }
 
-const BACKEND_BASES = new Set(["dashboard", "patients", "op", "beds", "er", "pharmacy", "symptom_ai", "billing", "accounts", "hrms", "employees", "patient_experience", "facility"])
+const BACKEND_BASES = new Set(["dashboard", "patients", "op", "beds", "er", "pharmacy", "symptom_ai", "billing", "accounts", "hrms", "employees", "patient_experience", "facility", "patient360"])
 
 /**
  * Built-in roles whose screens are not backend modules at all (laboratory, radiology, surgery, ICU, nursing, the doctor

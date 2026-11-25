@@ -60,6 +60,7 @@ ASSIGNABLE_MODULES = (
     "employees",  # Administration
     "patient_experience",  # Administration
     "facility",  # Administration -- facility & admin coordination (hr-api)
+    "patient360",  # AI -- Patient 360 care coordination (modules/patient360)
 )
 
 MODULE_BASE_PERMISSION = {
@@ -75,6 +76,7 @@ MODULE_BASE_PERMISSION = {
     "employees": "employees.read",
     "patient_experience": "patient_experience.read",
     "facility": "facility.read",
+    "patient360": "patient360.read",
 }
 
 # module_access entries are stored as a flat JSON array of strings, same as
@@ -249,6 +251,24 @@ SUB_MODULES = {
         "feedback": {
             "label": "Respond to Feedback",
             "permissions": ["patient_experience.write"],
+        },
+    },
+    "patient360": {
+        "coordination": {
+            "label": "Care Coordination (enrol, journeys, tasks, surveys)",
+            "permissions": ["patient360.coordination.write"],
+        },
+        "consent": {
+            "label": "Communication Consent & Preferences",
+            "permissions": ["patient360.consent.write"],
+        },
+        "approvals": {
+            "label": "Clinically Approve Journeys & Surveys",
+            "permissions": ["patient360.approve"],
+        },
+        "segments": {
+            "label": "Segments & Outreach Preparation",
+            "permissions": ["patient360.segments.write"],
         },
     },
 }

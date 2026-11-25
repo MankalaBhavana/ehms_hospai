@@ -151,6 +151,20 @@ def handle_incoming_message(phone, text, reply=None):
     """reply sends the thank-you / escalation message back; defaults to the
     Meta Graph sender below, the Twilio webhook passes core.whatsapp's."""
     reply = reply or send_whatsapp_message
+    # A STOP reply is an opt-out, not feedback: record it for Patient 360 and stop here. (The provider sends its own
+    # confirmation; replying with a "thank you for your feedback" to a STOP would be wrong.)
+    from modules.patient360 import rules as patient360_rules
+
+    if patient360_rules.is_opt_out_message(text):
+        try:
+            from modules.patient360.service import record_opt_out_by_phone
+
+            record_opt_out_by_phone(phone, channel="whatsapp")
+        except Exception:
+            import logging
+
+            logging.getLogger(__name__).exception("Failed to record WhatsApp opt-out")
+        return
     rating, comment = parse_rating_and_comment(text)
 
     # Matched on the last 10 digits: the feedback window is opened with

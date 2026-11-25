@@ -191,6 +191,8 @@ export const ALL_SYSTEM_MODULES = [
   "clinical_summaries",
   "bulk_ai",
   "nl_filtering",
+  "patient360",
+  "patient360_search",
 
   "beds",
 ]

@@ -4,7 +4,7 @@
 - API layer: each domain lives in its own Flask Blueprint under `backend/modules/<name>/routes.py`
   (patients, billing, pharmacy, hr, beds, op, documents, emr, whatsapp, accounts, reports,
   symptom_ai, ocr_portal, bulk_import, queue, appointments, admin, auth, dashboard, ai_exports,
-  audit) -- all registered onto the app in `backend/app.py`, which itself stays a thin
+  audit, patient360) -- all registered onto the app in `backend/app.py`, which itself stays a thin
   composition root (app factory, blueprint registration, a handful of shared helpers like
   `require_permissions`/`current_hospital_id`/`log_audit_event`).
 - Service/data layer: `backend/utils/database.py` holds all SQL and domain data-access

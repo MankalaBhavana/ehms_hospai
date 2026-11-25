@@ -391,16 +391,16 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
   )
 }
 
-// --- Hero landing page data source nodes for circular diagram ---
+// --- Hero landing page circular diagram ---
 const DATA_NODES = [
-  { icon: "🫀", label: "Medical History",  angle: -135 },
-  { icon: "📋", label: "Clinical Records", angle: -90  },
-  { icon: "🧪", label: "Lab & Imaging",    angle: -45  },
-  { icon: "💊", label: "Medications",      angle: 0    },
-  { icon: "📅", label: "Appointments",     angle: 45   },
-  { icon: "🧭", label: "Care Journey",     angle: 90   },
-  { icon: "💬", label: "Communications",   angle: 135  },
-  { icon: "📄", label: "Documents",        angle: 180  },
+  { label: "Medical History",  angle: -135, bg: "#FFE4EF", iconBg: "#F472B6", svg: "M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z" },
+  { label: "Clinical Records", angle: -90,  bg: "#E0F2FE", iconBg: "#38BDF8", svg: "M4.5 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM14.25 8.625a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0ZM1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM17.25 19.128l-.001.144a2.25 2.25 0 0 1-.233.96 10.088 10.088 0 0 0 5.06-1.01.75.75 0 0 0 .42-.643 4.875 4.875 0 0 0-6.957-4.611 8.586 8.586 0 0 1 1.71 5.157v.003Z" },
+  { label: "Lab & Imaging",    angle: -45,  bg: "#FEF3C7", iconBg: "#F59E0B", svg: "M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" },
+  { label: "Medications",      angle: 0,    bg: "#F3E8FF", iconBg: "#A855F7", svg: "M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" },
+  { label: "Appointments",     angle: 45,   bg: "#DCFCE7", iconBg: "#22C55E", svg: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" },
+  { label: "Care Journey",     angle: 90,   bg: "#E0F2FE", iconBg: "#0EA5E9", svg: "M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" },
+  { label: "Communications",   angle: 135,  bg: "#E0F2FE", iconBg: "#3B82F6", svg: "M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V20.25a.75.75 0 0 0 1.28.53l3.58-3.58A48.52 48.52 0 0 0 11.25 17c2.115 0 4.198-.137 6.24-.402 1.129-.146 2.112-.717 2.76-1.635Z" },
+  { label: "Documents",        angle: 180,  bg: "#FEF9C3", iconBg: "#EAB308", svg: "M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" },
 ]
 
 /** Hosp AI → Patient 360°: hero landing page + search. */
@@ -460,7 +460,7 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
     <div className="flex-1 overflow-y-auto">
       <div className="relative min-h-screen bg-gradient-to-br from-[#E8F0FE] via-[#EEF4FF] to-white overflow-hidden">
 
-        {/* Decorative "+" marks scattered in background */}
+        {/* Decorative "+" marks */}
         {[
           { top: "8%",  left: "4%",  sz: 20, op: 0.18 },
           { top: "20%", left: "48%", sz: 15, op: 0.12 },
@@ -481,15 +481,12 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
 
           {/* LEFT: title, tagline, pills, search */}
           <div className="flex-1 flex flex-col justify-center px-8 py-10 lg:px-14 lg:py-16 max-w-2xl">
-
             <h1 className="text-4xl lg:text-5xl font-bold text-[#1E3A6E] leading-tight tracking-tight">
               Patient <span className="text-[#1B4FD8]">360°</span>
             </h1>
-
             <p className="mt-3 text-xl font-semibold text-[#1B4FD8]">
               One patient. Complete view. Better care.
             </p>
-
             <p className="mt-3 text-[#475569] text-[13.5px] leading-relaxed max-w-md">
               Get a unified view of your patient's journey — from registration to follow-up — with clinical data, care coordination and PatientReach AI.
             </p>
@@ -530,13 +527,10 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
               </button>
             </form>
 
-            {/* Feedback / results */}
             {error && <div className="mt-4"><ErrorBox error={error} onRetry={search} /></div>}
-
             {!openId && matches && matches.length === 0 && (
               <div className="mt-4"><Empty>No registered patient matches "{query.trim()}". Check the ID, name spelling or mobile number.</Empty></div>
             )}
-
             {!openId && matches && matches.length > 1 && (
               <section className="mt-4 rounded-lg border border-[#DDE2EC] bg-white shadow-sm">
                 <header className="border-b border-[#EEF1F6] px-4 py-2 text-[12.5px] font-semibold">
@@ -562,68 +556,100 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
             )}
           </div>
 
-          {/* RIGHT: Circular data-source diagram */}
+          {/* RIGHT: Circular data-source diagram — matches reference image exactly */}
           <div className="flex-1 flex items-center justify-center p-8 relative">
-            <div style={{ position: "relative", width: 320, height: 320 }}>
-              {/* Dashed orbit ring */}
-              <div style={{
-                position: "absolute", inset: 0, borderRadius: "50%",
-                border: "1.5px dashed #93C5FD", opacity: 0.5,
-              }} />
-              {/* Inner ring */}
-              <div style={{
-                position: "absolute", inset: 24, borderRadius: "50%",
-                border: "1px solid #BFDBFE", opacity: 0.5,
-              }} />
+            <div style={{ position: "relative", width: 340, height: 340 }}>
 
-              {/* Center avatar */}
-              <div style={{
-                position: "absolute", top: "50%", left: "50%",
-                transform: "translate(-50%,-50%)",
-                width: 72, height: 72, borderRadius: "50%",
-                background: "linear-gradient(135deg,#1B4FD8 0%,#3B6EF0 100%)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 4px 20px rgba(27,79,216,0.35)",
-                zIndex: 10, fontSize: 32,
-              }}>🧑‍⚕️</div>
+              {/* Outer dashed orbit ring */}
+              <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
+                {/* Main orbit circle */}
+                <circle cx="170" cy="170" r="148" fill="none" stroke="#BFDBFE" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.7" />
+                {/* Inner glow ring */}
+                <circle cx="170" cy="170" r="110" fill="none" stroke="#DBEAFE" strokeWidth="1" opacity="0.5" />
 
-              {/* SVG lines from center to nodes */}
-              <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+                {/* Dashed lines from center to each node + dot at orbit */}
                 {DATA_NODES.map((node) => {
                   const rad = (node.angle * Math.PI) / 180
-                  const r = 148, cx = 160 + r * Math.sin(rad), cy = 160 - r * Math.cos(rad)
-                  const dx = cx - 160, dy = cy - 160, dist = Math.sqrt(dx * dx + dy * dy)
-                  const cr = 36
+                  const r = 148, cx = 170 + r * Math.sin(rad), cy = 170 - r * Math.cos(rad)
+                  const dx = cx - 170, dy = cy - 170, dist = Math.sqrt(dx * dx + dy * dy)
+                  const cr = 44 // center circle radius
+                  const sx = 170 + (cr / dist) * dx, sy = 170 + (cr / dist) * dy
+                  const ex = cx - (26 / dist) * dx, ey = cy - (26 / dist) * dy
                   return (
-                    <line key={node.label}
-                      x1={160 + (cr / dist) * dx} y1={160 + (cr / dist) * dy}
-                      x2={cx - (22 / dist) * dx} y2={cy - (22 / dist) * dy}
-                      stroke="#93C5FD" strokeWidth={1} strokeDasharray="3 3" opacity={0.7} />
+                    <g key={node.label}>
+                      <line x1={sx} y1={sy} x2={ex} y2={ey}
+                        stroke="#93C5FD" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.65" />
+                      {/* Small dot on orbit ring at connection point */}
+                      <circle cx={cx} cy={cy} r="3.5" fill="#60A5FA" opacity="0.5" />
+                    </g>
                   )
                 })}
               </svg>
 
-              {/* Node cards */}
+              {/* Center — person avatar */}
+              <div style={{
+                position: "absolute", top: "50%", left: "50%",
+                transform: "translate(-50%,-50%)",
+                width: 90, height: 90, borderRadius: "50%",
+                background: "linear-gradient(145deg, #60A5FA 0%, #3B82F6 50%, #2563EB 100%)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: "0 0 0 8px rgba(96,165,250,0.18), 0 4px 24px rgba(37,99,235,0.30)",
+                zIndex: 10,
+              }}>
+                {/* Person SVG avatar */}
+                <svg viewBox="0 0 64 80" style={{ width: 56, height: 60 }} fill="none">
+                  {/* Head */}
+                  <ellipse cx="32" cy="20" rx="13" ry="14" fill="white" opacity="0.95" />
+                  {/* Neck */}
+                  <rect x="27" y="32" width="10" height="7" rx="4" fill="white" opacity="0.85" />
+                  {/* Scrubs / body */}
+                  <path d="M14 72 Q14 50 32 48 Q50 50 50 72Z" fill="white" opacity="0.9" />
+                  {/* Collar V */}
+                  <path d="M27 48 L32 56 L37 48" stroke="#BFDBFE" strokeWidth="1.5" fill="none" />
+                </svg>
+              </div>
+
+              {/* Node cards — circular, styled like reference image */}
               {DATA_NODES.map((node) => {
                 const rad = (node.angle * Math.PI) / 180
                 const r = 148
+                const cx = 170 + r * Math.sin(rad)
+                const cy = 170 - r * Math.cos(rad)
                 return (
                   <div key={node.label} style={{
                     position: "absolute",
-                    left: 160 + r * Math.sin(rad),
-                    top: 160 - r * Math.cos(rad),
+                    left: cx, top: cy,
                     transform: "translate(-50%,-50%)",
                     zIndex: 5,
+                    display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
                   }}>
+                    {/* Circular card */}
                     <div style={{
-                      display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-                      background: "white", border: "1.5px solid #DCE6FB", borderRadius: 12,
-                      padding: "6px 10px", boxShadow: "0 2px 8px rgba(27,79,216,0.10)",
-                      minWidth: 70, textAlign: "center",
+                      width: 52, height: 52,
+                      borderRadius: "50%",
+                      background: node.bg,
+                      border: "2px solid white",
+                      boxShadow: "0 2px 12px rgba(27,79,216,0.13)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
                     }}>
-                      <span style={{ fontSize: 20 }} aria-hidden>{node.icon}</span>
-                      <span style={{ fontSize: 9.5, fontWeight: 600, color: "#1E3A6E", lineHeight: 1.3, whiteSpace: "nowrap" }}>{node.label}</span>
+                      <div style={{
+                        width: 30, height: 30, borderRadius: "50%",
+                        background: node.iconBg,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                      }}>
+                        <svg viewBox="0 0 24 24" style={{ width: 16, height: 16 }} fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d={node.svg} />
+                        </svg>
+                      </div>
                     </div>
+                    {/* Label */}
+                    <span style={{
+                      fontSize: 10, fontWeight: 600, color: "#1E3A6E",
+                      textAlign: "center", lineHeight: 1.3,
+                      whiteSpace: "nowrap",
+                      background: "rgba(255,255,255,0.85)",
+                      borderRadius: 4, padding: "1px 4px",
+                    }}>{node.label}</span>
                   </div>
                 )
               })}

@@ -49,9 +49,9 @@ const MODULE_CATEGORIES = [
   },
   {
     id: "finance",
-    title: "Revenue, Billing & Insurance",
-    description: "Cashier billing, financial accounts ledger, and cashless TPA insurance claims",
-    modules: ["billing", "accounts", "insurance"],
+    title: "Billing & Insurance",
+    description: "Cashier billing, patient invoices, and cashless TPA insurance claims",
+    modules: ["billing", "insurance"],
   },
   {
     id: "workforce",
@@ -89,7 +89,6 @@ export const ALL_ADMIN_ASSIGNABLE_MODULES: Array<{
   { key: "patient360", label: "Patient 360° Care Coordination", category: "Management", icon: "🧭" },
   { key: "billing", label: "Billing & Cash Counter", category: "Finance", icon: "💳" },
   { key: "insurance", label: "Insurance & TPA Claims", category: "Finance", icon: "🛡️" },
-  { key: "accounts", label: "Accounts & General Ledger", category: "Finance", icon: "🏦" },
   { key: "employees", label: "Hospital Staff & User Accounts", category: "Management", icon: "👥" },
   { key: "intelligence", label: "Hosp AI Clinical Intelligence", category: "Management", icon: "🤖" },
   { key: "reports", label: "Reports & Hospital Analytics", category: "Management", icon: "📈" },
@@ -117,7 +116,6 @@ const MODULE_METADATA: Record<string, { name: string; icon: string; description:
   laboratory: { name: "Laboratory", icon: "🧪", description: "Specimen collection, hematology/biochemistry tests, and lab result sign-offs" },
   radiology: { name: "Radiology & Imaging", icon: "🩻", description: "X-Ray, CT, MRI, Ultrasound imaging worklists and radiologist reports" },
   billing: { name: "Billing & Cashier", icon: "💳", description: "OP/IP/ER invoices, cash desk receipts, lab payments, and refunds" },
-  accounts: { name: "Financial Accounts", icon: "📊", description: "General ledger, journal vouchers, accounts payable/receivable, and P&L" },
   insurance: { name: "Insurance & TPA", icon: "🛡️", description: "Cashless pre-auth requests, claim document packs, query responses, settlements" },
   admin: { name: "Administration", icon: "⚙️", description: "Centralized RBAC, user provisioning, clinical directory, tariff catalog" },
   employees: { name: "Hospital Staff & Users", icon: "👥", description: "Employee master directory, credentials, and access role governance" },
@@ -519,6 +517,10 @@ export default function Administration({
       customModules: user.customModules || user.allowedModules,
       allowedModules: user.allowedModules || user.customModules,
       department: user.department,
+      email: user.email || undefined,
+      phone: user.phone || undefined,
+      jobRole: user.job_role || undefined,
+      createdAt: user.created_at ? String(user.created_at) : undefined,
     } as AppUser))
       : []
 
@@ -541,6 +543,10 @@ export default function Administration({
         customModules: existing?.customModules || u.customModules,
         allowedModules: existing?.allowedModules || u.allowedModules,
         department: existing?.department || u.department,
+        email: u.email || existing?.email,
+        phone: u.phone || existing?.phone,
+        jobRole: u.jobRole || existing?.jobRole,
+        createdAt: u.createdAt || existing?.createdAt,
       })
     })
     setUsers(Array.from(mergedUsersMap.values()))
@@ -1035,11 +1041,11 @@ export default function Administration({
 
   const applyPresetFinance = () => {
     if (!selectedRole || selectedRoleIsProtected) return
-    const finMods = ["billing", "accounts", "insurance"]
+    const finMods = ["billing", "insurance"]
     const finRules = finMods.flatMap((m) => [`${m}:view`, `${m}:create`, `${m}:edit`, `${m}:approve`, `${m}:export`])
     const updatedRole = { ...selectedRole, allowedModules: finRules }
     setRoles(roles.map((r) => (r.id === selectedRole.id ? updatedRole : r)))
-    setRoleNotice("Applied Finance, Billing & TPA preset.")
+    setRoleNotice("Applied Billing & Insurance preset.")
   }
 
   const applyPresetReadOnly = () => {
@@ -1096,17 +1102,25 @@ export default function Administration({
 
   // Quick 1-click User Status Toggle
   const handleQuickToggleUserStatus = async (user: AppUser) => {
-    const nextStatus = (user.status || "Active") === "Active" ? "Inactive" : "Active"
-    const updated = { ...user, status: nextStatus as "Active" | "Inactive" }
-    RoleDatabase.upsertUser(updated)
+    const nextStatus = ((user.status || "Active") === "Active" ? "Inactive" : "Active") as "Active" | "Inactive"
     try {
+      // The server is the source of truth: wait for it, and show its error instead of hiding it.
       await apiFetch(`/api/admin/users/${encodeURIComponent(user.id)}`, {
         method: "PUT",
         body: JSON.stringify({ status: nextStatus }),
       })
-    } catch {}
-    await refreshAccessGovernance()
+    } catch (error: any) {
+      toast.error(`Could not make @${user.username} ${nextStatus}: ${error?.message || "server error"}`)
+      return
+    }
+    RoleDatabase.upsertUser({ ...user, status: nextStatus })
+    setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, status: nextStatus } : u)))
     setUserNotice(`User @${user.username} is now ${nextStatus}.`)
+    try {
+      await refreshAccessGovernance()
+    } catch {
+      /* the list already shows the saved change */
+    }
   }
 
   // User Accounts Operations
@@ -1326,32 +1340,42 @@ export default function Administration({
   const handleDeleteUser = async (user: AppUser) => {
     if (
       !confirm(
-        `Deactivate access for @${user.username} (${user.name})? They will be signed out immediately and can no longer log in. The account stays in the inactive list for audit history.`,
+        `Delete @${user.username} (${user.name})? They are signed out immediately, can no longer log in, and are removed from the staff list. This cannot be undone.`,
       )
     )
       return
 
-    // 1. Update status to Inactive in RoleDatabase
-    RoleDatabase.upsertUser({
-      ...user,
-      status: "Inactive",
-    })
-    setUsers(RoleDatabase.getUsers())
-
-    // 2. Show toast notification
-    const msg = `User @${user.username} access deactivated.`
-    toast.success(msg, { duration: 4000, id: "admin-delete-user-toast" })
-    setUserNotice(msg)
-    setTimeout(() => {
-      setUserNotice((prev) => (prev === msg ? "" : prev))
-    }, 6000)
-
-    // 3. Sync with backend
     try {
       await apiFetch(`/api/admin/users/${encodeURIComponent(user.id)}`, { method: "DELETE" })
-      void refreshAccessGovernance().catch(() => {})
-    } catch (error) {
-      console.warn("Backend delete user sync notice:", error)
+    } catch (error: any) {
+      toast.error(`Could not delete @${user.username}: ${error?.message || "server error"}`)
+      return
+    }
+
+    // Remove the browser copies too, otherwise the merge in refreshAccessGovernance brings the row back.
+    RoleDatabase.deleteUser(user.id)
+    RoleDatabase.getUsers()
+      .filter((u) => u.username.toLowerCase() === user.username.toLowerCase())
+      .forEach((u) => RoleDatabase.deleteUser(u.id))
+    setUsers((prev) => prev.filter((u) => u.username.toLowerCase() !== user.username.toLowerCase()))
+
+    // A doctor's login is also their doctor-master entry: remove that too so they are not offered for appointments.
+    const linkedDoctor = doctors.find(
+      (d) =>
+        (d.staffId && d.staffId === user.staffId) ||
+        d.id === user.staffId ||
+        (d.username || "").toLowerCase() === user.username.toLowerCase(),
+    )
+    if (linkedDoctor) setDoctors(deleteDoctorMaster(linkedDoctor.id, false))
+
+    const msg = `User @${user.username} deleted.`
+    toast.success(msg, { duration: 4000, id: "admin-delete-user-toast" })
+    setUserNotice(msg)
+    setTimeout(() => setUserNotice((prev) => (prev === msg ? "" : prev)), 6000)
+    try {
+      await refreshAccessGovernance()
+    } catch {
+      /* the row is already gone from the list */
     }
   }
 
@@ -2019,52 +2043,52 @@ export default function Administration({
         </div>
 
         {/* Guided workflow navigation */}
-        <div className="flex items-center gap-6 overflow-x-auto text-[12.5px] font-semibold border-t border-[#F1F5F9] pt-1">
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-[#F1F5F9] pt-3 text-[12.5px] font-semibold">
           {[
             { id: "overview", label: "Control Centre" },
             {
               id: "doctor_availability",
-              label: "Doctor Availability & Assignment",
+              label: "Doctor Availability",
             },
             {
               id: "doctors",
-              label: "1. Doctor Master & Workspace",
+              label: "Doctors",
               count: doctors.length,
             },
             {
               id: "rates",
-              label: "2. Rates & Charges",
+              label: "Rates & Charges",
             },
             {
               id: "roles",
-              label: "3. Roles & Access",
+              label: "Roles & Access",
               count: roles.length,
             },
             {
               id: "users",
-              label: "4. Hospital Staff & Users",
+              label: "Hospital Staff & Users",
               count: users.length,
             },
-            { id: "audit", label: "5. Review Activity", count: auditLogs.length },
-            { id: "settings", label: "6. Configure" },
+            { id: "audit", label: "Activity Log", count: auditLogs.length },
+            { id: "settings", label: "Settings" },
           ].map((tab) => {
             const isActive = activeTab === tab.id
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-2.5 border-b-2 transition-all cursor-pointer flex items-center gap-2 ${
+                className={`px-3.5 py-2 border transition-all cursor-pointer flex items-center gap-2 ${
                   isActive
-                    ? "border-[#1B4FD8] text-[#1B4FD8] font-bold"
-                    : "border-transparent text-[#64748B] hover:text-[#0F172A]"
+                    ? "border-[#1B4FD8] bg-[#1B4FD8] text-white font-bold shadow-sm"
+                    : "border-[#DDE2EC] bg-white text-[#475569] hover:border-blue-300 hover:text-[#0F172A]"
                 }`}
               >
                 <span>{tab.label}</span>
                 {tab.count !== undefined && (
                   <span
-                    className={`text-[11px] px-1.5 py-0.2 font-mono ${
+                    className={`text-[11px] px-1.5 font-mono ${
                       isActive
-                        ? "bg-blue-50 text-[#1B4FD8]"
+                        ? "bg-white/20 text-white"
                         : "bg-gray-100 text-gray-600"
                     }`}
                   >
@@ -2080,7 +2104,7 @@ export default function Administration({
       {/* ── Main Tab Content Container ─────────────────────────────────── */}
       <div className="px-8 py-6 flex-1 flex flex-col min-h-0 bg-[#F4F7FB]">
         {activeTab === "overview" && (
-          <div className="space-y-5 max-w-7xl">
+          <div className="space-y-5 w-full">
             <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-[#0C2461] via-[#1447A6] to-[#2563D9] px-6 py-5 text-white shadow-sm">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
@@ -2092,20 +2116,6 @@ export default function Administration({
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {[
-                { label: "Doctor Workspace & Master", value: doctors.length, detail: "Clinical profiles & live oversight", tone: "bg-blue-50 text-blue-700", target: "doctors" },
-                { label: "User accounts", value: users.length, detail: "Identities provisioned", tone: "bg-violet-50 text-violet-700", target: "users" },
-                { label: "Access roles", value: roles.length, detail: "Permission templates", tone: "bg-emerald-50 text-emerald-700", target: "roles" },
-                { label: "Activity records", value: auditLogs.length, detail: "Recent governance events", tone: "bg-amber-50 text-amber-700", target: "audit" },
-              ].map((metric) => (
-                <button key={metric.label} onClick={() => setActiveTab(metric.target as typeof activeTab)} className="rounded-xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md">
-                  <div className="flex items-start justify-between gap-3"><span className="text-[12px] font-semibold text-slate-600">{metric.label}</span><span className={`rounded-md px-2 py-1 text-[11px] font-bold ${metric.tone}`}>View</span></div>
-                  <div className="mt-3 text-2xl font-bold text-slate-900">{metric.value}</div>
-                  <p className="mt-1 text-[11px] text-slate-500">{metric.detail}</p>
-                </button>
-              ))}
-            </div>
 
             <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="border-b border-slate-100 px-5 py-4"><h3 className="text-[14px] font-bold text-slate-900">Operating workflow</h3><p className="mt-0.5 text-[12px] text-slate-500">Follow the sequence to avoid orphan profiles, unscoped access, or unreviewed changes.</p></div>
@@ -2925,58 +2935,6 @@ export default function Administration({
               </button>
             </div>
 
-            {/* Metric Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 p-5 bg-[#F8FAFC] border-b border-[#E2E8F0]">
-              <div className="bg-white border border-[#E2E8F0] p-4 rounded-xs shadow-2xs">
-                <div className="flex items-center justify-between text-[#64748B] text-[12px] font-semibold">
-                  <span>Total User Accounts</span>
-                  <span className="text-base">👥</span>
-                </div>
-                <div className="text-2xl font-bold text-[#0F172A] mt-1">{users.length}</div>
-                <div className="text-[11px] text-[#64748B] mt-0.5">Provisioned staff accounts</div>
-              </div>
-
-              <div className="bg-white border border-emerald-200 p-4 rounded-xs shadow-2xs">
-                <div className="flex items-center justify-between text-emerald-700 text-[12px] font-semibold">
-                  <span>Active Logins</span>
-                  <span className="text-base">🟢</span>
-                </div>
-                <div className="text-2xl font-bold text-emerald-700 mt-1">
-                  {users.filter((u) => (u.status || "Active") === "Active").length}
-                </div>
-                <div className="text-[11px] text-emerald-600 mt-0.5">Permitted to sign in</div>
-              </div>
-
-              <div className="bg-white border border-amber-200 p-4 rounded-xs shadow-2xs">
-                <div className="flex items-center justify-between text-amber-700 text-[12px] font-semibold">
-                  <span>Inactive / Suspended</span>
-                  <span className="text-base">⏸️</span>
-                </div>
-                <div className="text-2xl font-bold text-amber-700 mt-1">
-                  {users.filter((u) => u.status === "Inactive").length}
-                </div>
-                <div className="text-[11px] text-amber-600 mt-0.5">Access disabled</div>
-              </div>
-
-              <div className="bg-white border border-blue-200 p-4 rounded-xs shadow-2xs">
-                <div className="flex items-center justify-between text-blue-700 text-[12px] font-semibold">
-                  <span>Doctors & Specialists</span>
-                  <span className="text-base">🩺</span>
-                </div>
-                <div className="text-2xl font-bold text-blue-700 mt-1">
-                  {
-                    users.filter(
-                      (u) =>
-                        u.roleId === "ROLE_DOCTOR" ||
-                        u.roleId.toLowerCase().includes("doctor") ||
-                        u.roleId.toLowerCase().includes("surgeon"),
-                    ).length
-                  }
-                </div>
-                <div className="text-[11px] text-blue-600 mt-0.5">Clinical providers</div>
-              </div>
-            </div>
-
             {userNotice && (
               <div className="mx-5 mt-4 flex items-center justify-between gap-3 rounded-xs border border-emerald-300 bg-emerald-50 px-4 py-2.5 text-[12.5px] font-semibold text-emerald-900 shadow-2xs">
                 <span className="flex items-center gap-2">
@@ -3077,33 +3035,36 @@ export default function Administration({
             </div>
 
             {/* Users Table */}
-            <div className="flex-1 overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
+            <div className="flex-1 overflow-auto max-h-[calc(100vh-420px)] min-h-[320px]">
+              <table className="w-full min-w-[1180px] text-left border-collapse">
+                <thead className="sticky top-0 z-10">
                   <tr className="bg-[#F1F5F9] border-b border-[#DDE2EC] text-[11px] text-[#475569] uppercase font-mono tracking-wider">
-                    <th className="px-6 py-3.5">Staff Member</th>
-                    <th className="px-6 py-3.5">Username</th>
-                    <th className="px-6 py-3.5">Staff ID</th>
-                    <th className="px-6 py-3.5">Assigned System Role</th>
-                    <th className="px-6 py-3.5 text-center">Account Status</th>
-                    <th className="px-6 py-3.5 text-right">Actions</th>
+                    <th className="px-4 py-3 w-12">#</th>
+                    <th className="px-4 py-3">Staff Member</th>
+                    <th className="px-4 py-3">Username / Staff ID</th>
+                    <th className="px-4 py-3">Department</th>
+                    <th className="px-4 py-3">Contact</th>
+                    <th className="px-4 py-3">Assigned System Role</th>
+                    <th className="px-4 py-3">Joined</th>
+                    <th className="px-4 py-3 text-center">Status</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F1F5F9] text-[13px] text-[#334155]">
                   {filteredUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-[#64748B]">
+                      <td colSpan={9} className="px-6 py-12 text-center text-[#64748B]">
                         No user accounts match the current filter criteria.
                       </td>
                     </tr>
                   ) : (
-                    filteredUsers.map((u) => {
+                    filteredUsers.map((u, idx) => {
                       const userRole = roles.find((r) => r.id === u.roleId)
                       const isDoc =
                         u.roleId === "ROLE_DOCTOR" ||
                         u.roleId.toLowerCase().includes("doctor") ||
                         u.roleId.toLowerCase().includes("surgeon")
-                      const isAdmin = u.roleId === "ROLE_ADMIN" || u.roleId === "ROLE_SUPERADMIN"
+                      const isAdmin = u.roleId === "ROLE_ADMIN" || u.roleId === "ROLE_SUPERADMIN" || u.roleId === "ROLE_OWNER"
                       const isNurse = u.roleId.toLowerCase().includes("nurse")
                       const isPharmacy = u.roleId.toLowerCase().includes("pharm")
 
@@ -3125,55 +3086,77 @@ export default function Administration({
                         .slice(0, 2)
                         .toUpperCase()
 
+                      const deptCount = (u.customModules && u.customModules.length > 0
+                        ? u.customModules
+                        : userRole?.allowedModules || u.allowedModules || []
+                      ).length
+                      const joined = u.createdAt ? new Date(u.createdAt) : null
+                      const joinedText = joined && !Number.isNaN(joined.getTime())
+                        ? joined.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+                        : "—"
+
                       return (
-                        <tr key={u.id} className="hover:bg-[#F8FAFC] transition-colors">
-                          <td className="px-6 py-3.5 font-bold text-[#0F172A]">
+                        <tr key={u.id} className="hover:bg-[#F8FAFC] transition-colors align-top">
+                          <td className="px-4 py-3.5 font-mono text-[12px] text-[#94A3B8]">{idx + 1}</td>
+
+                          <td className="px-4 py-3.5">
                             <div className="flex items-center gap-3">
                               <div
-                                className={`w-8 h-8 rounded-full border flex items-center justify-center font-bold text-[12px] shrink-0 ${avatarBg}`}
+                                className={`w-9 h-9 border flex items-center justify-center font-bold text-[12px] shrink-0 ${avatarBg}`}
                               >
                                 {initials}
                               </div>
-                              <div>
-                                <div className="font-bold text-[#0F172A]">{u.name}</div>
+                              <div className="min-w-0">
+                                <div className="font-bold text-[#0F172A] truncate">{u.name}</div>
                                 <div className="text-[11px] text-[#64748B] font-normal">
-                                  {isDoc ? "Clinical Specialist" : isAdmin ? "Administrator" : "Hospital Staff"}
+                                  {u.jobRole || (isDoc ? "Clinical Specialist" : isAdmin ? "Administrator" : "Hospital Staff")}
                                 </div>
                               </div>
                             </div>
                           </td>
 
-                          <td className="px-6 py-3.5 font-mono text-[#1B4FD8] font-medium">
-                            @{u.username}
+                          <td className="px-4 py-3.5">
+                            <div className="font-mono text-[#1B4FD8] font-medium">@{u.username}</div>
+                            <div className="font-mono text-[11.5px] text-[#64748B]">{u.staffId}</div>
                           </td>
 
-                          <td className="px-6 py-3.5 font-mono text-[12px] text-[#64748B]">
-                            {u.staffId}
+                          <td className="px-4 py-3.5">
+                            {u.department ? (
+                              <span className="inline-block bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 text-[12px] font-semibold">
+                                {u.department}
+                              </span>
+                            ) : (
+                              <span className="text-[#94A3B8]">—</span>
+                            )}
                           </td>
 
-                          <td className="px-6 py-3.5">
+                          <td className="px-4 py-3.5 text-[12px]">
+                            <div className={u.email ? "text-[#334155] break-all" : "text-[#94A3B8]"}>{u.email || "No email"}</div>
+                            <div className={u.phone ? "text-[#64748B]" : "text-[#94A3B8]"}>{u.phone || "No phone"}</div>
+                          </td>
+
+                          <td className="px-4 py-3.5">
                             <div className="flex flex-col gap-1 items-start">
-                              <span className="text-[11.5px] bg-blue-50 text-[#1B4FD8] px-2.5 py-1 border border-blue-200 font-semibold rounded-xs">
+                              <span className="text-[11.5px] bg-blue-50 text-[#1B4FD8] px-2.5 py-1 border border-blue-200 font-semibold">
                                 {userRole?.name || u.roleId}
                               </span>
                               {u.customModules && u.customModules.length > 0 ? (
-                                <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-300 px-1.5 py-0.5 font-bold rounded flex items-center gap-1" title={u.customModules.join(", ")}>
-                                  <span>⚡ Custom:</span>
-                                  <span>{u.customModules.length} depts</span>
+                                <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-300 px-1.5 py-0.5 font-bold" title={u.customModules.join(", ")}>
+                                  ⚡ Custom: {u.customModules.length} depts
                                 </span>
                               ) : (
-                                <span className="text-[10px] text-[#64748B]">
-                                  Role Default ({userRole?.allowedModules?.length || 0} depts)
-                                </span>
+                                <span className="text-[10px] text-[#64748B]">Role default ({deptCount} depts)</span>
                               )}
                             </div>
                           </td>
 
-                          <td className="px-6 py-3.5 text-center">
+                          <td className="px-4 py-3.5 text-[12px] text-[#64748B] whitespace-nowrap">{joinedText}</td>
+
+                          <td className="px-4 py-3.5 text-center">
                             <button
                               onClick={() => handleQuickToggleUserStatus(u)}
                               title="Click to toggle account status"
-                              className={`text-[11px] font-bold px-2.5 py-1 border rounded-xs cursor-pointer transition-all ${
+                              className={`text-[11px] font-bold px-2.5 py-1 border cursor-pointer transition-all ${
                                 (u.status || "Active") === "Active"
                                   ? "bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100"
                                   : "bg-red-50 text-red-700 border-red-300 hover:bg-red-100"
@@ -3183,7 +3166,7 @@ export default function Administration({
                             </button>
                           </td>
 
-                          <td className="px-6 py-3.5 text-right">
+                          <td className="px-4 py-3.5 text-right">
                             <div className="flex items-center justify-end gap-2">
                               <button
                                 onClick={() => {
@@ -3205,12 +3188,12 @@ export default function Administration({
                                 }}
                                 className="text-[12px] bg-white hover:bg-amber-50 text-amber-700 border border-amber-300 px-2.5 py-1 font-semibold cursor-pointer"
                               >
-                                🔑 Reset Pass
+                                🔑 Reset
                               </button>
 
                               <button
                                 onClick={() => handleDeleteUser(u)}
-                                title="Deactivate user access"
+                                title="Delete this staff account"
                                 className="text-[12px] bg-white hover:bg-red-50 text-red-600 border border-red-200 px-2 py-1 cursor-pointer"
                               >
                                 🗑️
@@ -3223,6 +3206,10 @@ export default function Administration({
                   )}
                 </tbody>
               </table>
+            </div>
+            <div className="flex items-center justify-between border-t border-[#DDE2EC] bg-[#F8FAFC] px-5 py-2.5 text-[12px] text-[#64748B]">
+              <span>Showing <b className="text-[#0F172A]">{filteredUsers.length}</b> of <b className="text-[#0F172A]">{users.length}</b> accounts</span>
+              <span>Scroll the table sideways on small screens to see every column.</span>
             </div>
           </div>
         )}

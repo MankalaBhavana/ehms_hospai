@@ -13358,7 +13358,7 @@ def list_admin_users(hospital_id=None, search=None, role=None, status=None):
     scoped_id = hospital_id or resolve_hospital_id()
     with get_connection() as conn:
         cursor = conn.cursor()
-        conditions = ["hospital_id = ?"]
+        conditions = ["hospital_id = ?", "SUBSTR(username, 1, 8) <> 'removed_'"]
         params = [scoped_id]
 
         if role and role != "all":
@@ -13551,26 +13551,62 @@ def update_admin_user(user_id, data, hospital_id=None):
 
 
 def delete_admin_user(user_id, hospital_id=None):
+    """Remove a staff account: sign it out, free its username / e-mail / staff id for reuse and
+    hide it from every list. The row itself is kept (audit history and other tables still
+    point at it), and any doctor profile linked to it is switched off.
+
+    Returns False when no such account exists. The primary administrator cannot be removed."""
     scoped_id = hospital_id or resolve_hospital_id()
     raw_str = str(user_id or "").strip()
     clean_str = raw_str.replace("U_", "").strip()
     try:
-        numeric_id = int(user_id)
+        numeric_id = int(clean_str)
     except (ValueError, TypeError):
-        try:
-            numeric_id = int(clean_str)
-        except (ValueError, TypeError):
-            numeric_id = None
+        numeric_id = None
     with get_connection() as conn:
         cursor = conn.cursor()
-        if numeric_id is not None:
-            sql = _to_sql_params("UPDATE users SET status = 'inactive' WHERE (id = ? OR employee_id = ? OR username = ?) AND hospital_id = ?")
-            cursor.execute(sql, (numeric_id, raw_str, raw_str, scoped_id))
-        else:
-            sql = _to_sql_params("UPDATE users SET status = 'inactive' WHERE (username = ? OR username = ? OR employee_id = ? OR employee_id = ?) AND hospital_id = ?")
-            cursor.execute(sql, (raw_str, clean_str, raw_str, clean_str, scoped_id))
+        cursor.execute(
+            _to_sql_params(
+                "SELECT id, username, email, employee_id, user_type, access_role FROM users "
+                "WHERE hospital_id = ? AND (id = ? OR employee_id IN (?, ?) OR username IN (?, ?))"
+            ),
+            (scoped_id, numeric_id if numeric_id is not None else -1, raw_str, clean_str, raw_str, clean_str),
+        )
+        rows = [dict(r) for r in cursor.fetchall()]
+        if not rows:
+            return False
+        for r in rows:
+            if (
+                str(r.get("user_type") or "").lower() == "admin"
+                or str(r.get("access_role") or "").lower() == "owner"
+                or str(r.get("username") or "").lower() == "admin"
+            ):
+                raise PermissionError("The primary administrator account cannot be removed")
+        for r in rows:
+            tag = f"removed_{r['id']}_"
+            if str(r["username"]).startswith("removed_"):
+                continue  # already removed
+            cursor.execute(
+                _to_sql_params(
+                    "UPDATE users SET status = 'inactive', username = ?, email = ?, employee_id = ? WHERE id = ?"
+                ),
+                (
+                    tag + str(r["username"]),
+                    (tag + str(r["email"])) if r.get("email") else None,
+                    (tag + str(r["employee_id"])) if r.get("employee_id") else None,
+                    r["id"],
+                ),
+            )
+            cursor.execute(_to_sql_params("DELETE FROM sessions WHERE user_id = ?"), (r["id"],))
+            cursor.execute(
+                _to_sql_params(
+                    "UPDATE doctors SET status = 'inactive' WHERE hospital_id = ? "
+                    "AND (user_id = ? OR username = ? OR staff_id = ?)"
+                ),
+                (scoped_id, r["id"], r["username"], r.get("employee_id")),
+            )
         conn.commit()
-        return cursor.rowcount >= 0
+        return True
 
 
 def admin_reset_user_password(user_id, new_password, hospital_id=None):

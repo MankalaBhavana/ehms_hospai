@@ -1,0 +1,22 @@
+# Adds automatic HTTPS (Caddy) in front of "web". Use together with docker-compose.yml:
+#   docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.tls.yml --env-file deploy/.env up -d --build
+# Needs DEMO_DOMAIN in deploy/.env (e.g. ehms.example.org) with its DNS A record pointing at this server.
+name: ehms
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - web
+    environment:
+      DEMO_DOMAIN: ${DEMO_DOMAIN:?set DEMO_DOMAIN}
+    command: ["sh", "-c", "printf '%s {\\n  reverse_proxy web:8443\\n}\\n' \"$$DEMO_DOMAIN\" > /etc/caddy/Caddyfile && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddydata:/data
+
+volumes:
+  caddydata:

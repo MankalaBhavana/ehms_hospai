@@ -56,7 +56,6 @@ ASSIGNABLE_MODULES = (
     "pharmacy",  # Operations
     "symptom_ai",  # AI
     "billing",  # Finance
-    "accounts",  # Finance -- general ledger
     "hrms",  # Administration
     "employees",  # Administration
     "patient_experience",  # Administration
@@ -73,7 +72,6 @@ MODULE_BASE_PERMISSION = {
     "pharmacy": "pharmacy.read",
     "symptom_ai": "symptom_ai.use",
     "billing": "billing.read",
-    "accounts": "accounts.read",
     "hrms": "hr.read",
     "employees": "employees.read",
     "patient_experience": "patient_experience.read",
@@ -205,15 +203,6 @@ SUB_MODULES = {
             "label": "Insurance Claims",
             "permissions": ["billing.claims.write"],
         },
-    },
-    # Split so that preparing, approving and closing can be held by different
-    # people -- the maker-checker rule in modules/accounts/workflows.py also refuses
-    # an approval by the voucher's own preparer, whatever permissions they hold.
-    "accounts": {
-        "ledger": {"label": "Post receipts, vouchers & operational entries", "permissions": ["accounts.ledger.write"]},
-        "approve": {"label": "Approve vouchers & reverse journals", "permissions": ["accounts.approve"]},
-        "periods": {"label": "Close periods & years, run depreciation", "permissions": ["accounts.periods.manage"]},
-        "setup": {"label": "Chart of accounts, assets & budgets", "permissions": ["accounts.setup.write"]},
     },
     "hrms": {
         "departments": {

@@ -149,6 +149,15 @@ export interface DBOPEncounter {
   }[]
   status: "Registered" | "Symptoms Captured" | "AI Recommended" | "Awaiting Doctor" | "Doctor Assigned" | "In Queue" | "Vitals Recorded" | "Awaiting Consultation" | "Under Consultation" | "Consultation Completed" | "Post-Consultation" | "Awaiting Billing" | "Billing Completed" | "Awaiting Investigation" | "OP Completed"
   pharmacyStatus?: "In Queue" | "Processing" | "Ready" | "Partially Dispensed" | "Dispensed" | "Rejected" | string
+  /**
+   * Set when an appointment is booked: the patient is held at reception until the consultation bill is
+   * paid (billing.status becomes "Paid") or the hold is released as an exception. While held they are
+   * not shown to the OP nurse or the doctor. See `isHeldForPayment`.
+   */
+  paymentHold?: boolean
+  /** Who released the hold without payment, when, and why. */
+  paymentHoldReleasedBy?: string
+  paymentHoldReleaseReason?: string
 
   timestamps: {
     arrival: string
@@ -188,6 +197,20 @@ export const OP_REGISTERED_EVENT = "hms:op-registered"
 
 /** The fake phone earlier queue syncs stored when the real one was missed. */
 export const PLACEHOLDER_PHONE = "+91 98765 43210"
+
+/**
+ * A booked patient whose consultation bill is still unpaid. They stay at reception: the OP nurse and the
+ * doctor do not see them, and they cannot be called through, until billing settles the visit.
+ */
+export function isHeldForPayment(
+  enc?: { paymentHold?: boolean; billing?: { status?: string } | null; timestamps?: { consultationStart?: string; consultationEnd?: string } | null } | null,
+): boolean {
+  if (!enc || enc.paymentHold !== true) return false
+  if (enc.billing?.status === "Paid") return false
+  // never hide a visit the doctor has already started or finished
+  if (enc.timestamps?.consultationStart || enc.timestamps?.consultationEnd) return false
+  return true
+}
 
 /**
  * True only when the nurse station has actually recorded observations. Every
@@ -1439,6 +1462,7 @@ class HospitalDatabase {
   ): DBOPEncounter | undefined {
     const existing = this.getEncounters().find((e) => e.id === id)
     if (!existing) return undefined
+    if (isHeldForPayment(existing)) return existing // consultation fee not paid yet
     const now = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
@@ -1453,12 +1477,24 @@ class HospitalDatabase {
     })
   }
 
+  /** Release a booked patient without payment (an authorised exception). The reason is kept on the visit. */
+  public releasePaymentHold(id: string, releasedBy: string, reason: string): DBOPEncounter | undefined {
+    const existing = this.getEncounters().find((e) => e.id === id)
+    if (!existing) return undefined
+    return this.updateEncounter(id, {
+      paymentHold: false,
+      paymentHoldReleasedBy: releasedBy,
+      paymentHoldReleaseReason: reason,
+    })
+  }
+
   public callToNurseStation(
     id: string,
     calledBy: string,
   ): DBOPEncounter | undefined {
     const existing = this.getEncounters().find((e) => e.id === id)
     if (!existing) return undefined
+    if (isHeldForPayment(existing)) return existing // consultation fee not paid yet
     const now = new Date().toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",

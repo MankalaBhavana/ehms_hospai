@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react"
+import { useLiveDoctorAvailability } from "../services/doctorLiveAvailability"
 import { opRegistrationFee, opConsultationFee } from "../services/opFees"
 import { PriceMaster } from "../services/priceMaster"
 import { Icon } from "./icons"
 import { StatusBadge, Btn, Input } from "./shared"
 import { db, DBPatient, DBOPEncounter, hasRecordedVitals } from "../services/db"
-import { getDoctorMaster, getDoctorConsultationFee, availabilityOf, type MasterDoctor } from "../services/doctorMaster"
+import { getDoctorMaster, getBookableDoctors, getDoctorConsultationFee, availabilityOf, type MasterDoctor } from "../services/doctorMaster"
 import { HospAILogo } from "./HospAILogo"
 import { useBranding } from "./branding/DocumentBranding"
 import { OpCardPreview, cardBarcodeValue, opCardDataFor, printOpCard } from "./opcard/OpCard"
@@ -175,7 +176,7 @@ function toDoctorProfile(doc: MasterDoctor, encounters: DBOPEncounter[]): Doctor
 
 /** Verified doctors for a specialty (all verified doctors when none match). */
 function doctorProfilesFor(specialty: string, encounters: DBOPEncounter[]): DoctorProfileInfo[] {
-  const verified = getDoctorMaster().filter((d) => d.verified)
+  const verified = getBookableDoctors()
   const matching = verified.filter(
     (d) =>
       d.specialty === specialty ||
@@ -238,6 +239,7 @@ export default function OPWorkflow({
   initialStep?: number
   initialEncounterId?: string
 }) {
+  useLiveDoctorAvailability() // re-render when a doctor goes active / inactive
   // Deliberately NOT persisted. Sticky form *fields* are what the user asked for;
   // a sticky step number meant reception opened the journey on whatever panel they
   // last used -- often billing, and often for a different patient than the one now

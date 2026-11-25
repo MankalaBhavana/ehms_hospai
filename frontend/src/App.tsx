@@ -57,10 +57,13 @@ const Pharmacy = lazy(() => import("./components/Pharmacy"))
 
 const Billing = lazy(() => import("./components/Billing"))
 const LabBillingQueue = lazy(() => import("./components/LabBillingQueue"))
+const InsuredPatientBilling = lazy(() => import("./components/billing/InsuredPatientBilling"))
+const BillingDashboard = lazy(() => import("./components/billing/BillingDashboard"))
+const RevenueDashboard = lazy(() => import("./components/billing/RevenueDashboard"))
+
 const InsuranceClaims = lazy(() => import("./components/insurance/ClaimsHome"))
 const InsuranceSettlementPage = lazy(() => import("./components/insurance/SettlementPage"))
 const InsurancePaymentGaps = lazy(() => import("./components/insurance/PaymentGapsPage"))
-const InsuredPatientBilling = lazy(() => import("./components/billing/InsuredPatientBilling"))
 const EnhancedAuditRulesPage = lazy(() => import("./components/insurance/EnhancedAuditRulesPage"))
 const InsuranceDashboardView = lazy(() => import("./components/insurance/InsuranceDashboardView"))
 const InsuranceCommandDashboard = lazy(() => import("./components/insurance/InsuranceCommandDashboard"))
@@ -76,9 +79,6 @@ import { InsuranceEngineService } from "./services/insuranceDb"
 import { TransferNotices } from "./services/transferNotices"
 import { IpCare, setCurrentActor } from "./services/ipCare"
 import { HospAILogo } from "./components/HospAILogo"
-const BillingDashboard = lazy(() => import("./components/billing/BillingDashboard"))
-
-const RevenueDashboard = lazy(() => import("./components/billing/RevenueDashboard"))
 
 const Inpatient = lazy(() => import("./components/Inpatient"))
 
@@ -170,7 +170,6 @@ import GenericReportPage, {
   ReportType,
 } from "./components/reports/GenericReportPage"
 
-const AccountsModule = lazy(() => import("./components/AccountsModule"))
 const MessagesPanel = lazy(() => import("./components/MessagesPanel"))
 import { useMediaQuery } from "./hooks/useMediaQuery"
 import PageErrorBoundary from "./components/PageErrorBoundary"
@@ -218,7 +217,7 @@ const insuranceModule = (m: string): string =>
         : m
 
 
-type Module = "dashboard" | "patients" | "appointments" | "emergency" | "emergency_ui" | "clinical" | "inpatient" | "nursing" | "laboratory" | "lab_dashboard" | "lab_orders_collection" | "lab_workbench" | "lab_review_reports" | "lab_admin_config" | "lab_orders" | "lab_sample_collection" | "lab_sample_reception" | "lab_worklists" | "lab_analyzers" | "lab_result_entry" | "lab_pathologist_review" | "lab_critical_alerts" | "lab_reports" | "lab_test_master" | "lab_quality_analytics" | "lab_settings" | "lab_processing" | "lab_critical" | "lab_catalog" | "lab_inventory" | "lab_analytics" | "lab_tat" | "radiology" | "radiology_overview" | "radiology_worklist" | "radiology_scheduling" | "radiology_operations" | "radiology_reporting" | "radiology_finalized" | "radiology_exceptions" | "radiology_analytics" | "radiology_admin" | "radiology_template_upload" | "radiology_templates" | "radiology_xray" | "radiology_ct" | "radiology_usg" | "radiology_mri" | "radiology_reports" | "pharmacy" | "pharmacy_dispensing" | "pharmacy_rx" | "pharmacy_ocr" | "pharmacy_returns" | "pharmacy_supplier_returns" | "pharmacy_medicine" | "pharmacy_category" | "pharmacy_suppliers" | "pharmacy_po" | "pharmacy_grn" | "pharmacy_ledger" | "pharmacy_transfers" | "pharmacy_expiry" | "pharmacy_write_off" | "pharmacy_analytics" | "pharmacy_notifications" | "pharmacy_users" | "pharmacy_audit" | "pharmacy_settings" | "surgery" | "billing" | "billing_op" | "billing_ip" | "billing_er" | "billing_unified" | "billing_insured" | "billing_revenue" | "icu" | "icu_micu" | "icu_sicu" | "icu_ccu" | "icu_nicu" | "icu_picu" | "icu_ward" | "discharge" | "triage" | "insurance" | "insurance_overview" | "insurance_desk" | "insurance_board" | "insurance_case" | "insurance_discharge" | "insurance_reports" | "insurance_preauth" | "insurance_eligibility" | "insurance_claims" | "insurance_queries" | "insurance_emails" | "insurance_settlement" | "insurance_gaps" | "insurance_reconciliation" | "insurance_masters" | "insurance_tpas" | "insurance_packages" | "insurance_pricing" | "insurance_docrules" | "insurance_patient_policies" | "insurance_guide" | "insurance_plan" | "insurance_mail_setup" | "insurance_setup" | "analytics" | "reports" | "reports_overview" | "reports_patients" | "reports_op" | "reports_er" | "reports_inpatient" | "reports_appointments" | "reports_doctors" | "reports_pharmacy" | "reports_laboratory" | "reports_radiology" | "reports_beds" | "reports_admissions" | "reports_discharges" | "reports_staff" | "admin" | "admin_doctors" | "chart" | "register" | "outpatient" | "queue" | "op_management" | "op_registration" | "op_workflow" | "op_nurse" | "opd_procedures" | "doctor_workflow" | "doctor_portal" | "scheduling" | "lab_billing" | "admissions" | "readmission" | "payments" | "revenue_reports" | "reports_pharmacy_damaged" | "reports_supplier_returns" | "hrms" | "my_hr" | "employees" | "hr_dashboard" | "hr_attendance" | "hr_staffing" | "hr_leave" | "hr_approvals" | "hr_payroll" | "hr_recruitment" | "hr_organization" | "hr_training" | "hr_performance" | "hr_compliance" | "hr_grievances" | "hr_reports" | "hr_announcements" | "hr_muster" | "hr_biometric" | "hr_timetables" | "hr_audit" | "patient_exp" | "patient_messages" | "registry" | "intelligence" | "ocr" | "dpi_ocr" | "symptom_ai" | "clinical_rag" | "clinical_summaries" | "bulk_ai" | "nl_filtering" | "beds" | "accounts" | "accounts_dashboard" | "accounts_coa" | "accounts_gl" | "accounts_receipts" | "accounts_payments" | "accounts_ar" | "accounts_ap" | "accounts_cash_bank" | "accounts_pharmacy" | "accounts_insurance" | "accounts_tax" | "accounts_budget" | "accounts_assets" | "accounts_reports" | "accounts_period_close" | "accounts_audit" | "accounts_manager" | "patient360" | "patient360_search"
+type Module = "dashboard" | "patients" | "appointments" | "emergency" | "emergency_ui" | "clinical" | "inpatient" | "nursing" | "laboratory" | "lab_dashboard" | "lab_orders_collection" | "lab_workbench" | "lab_review_reports" | "lab_admin_config" | "lab_orders" | "lab_sample_collection" | "lab_sample_reception" | "lab_worklists" | "lab_analyzers" | "lab_result_entry" | "lab_pathologist_review" | "lab_critical_alerts" | "lab_reports" | "lab_test_master" | "lab_quality_analytics" | "lab_settings" | "lab_processing" | "lab_critical" | "lab_catalog" | "lab_inventory" | "lab_analytics" | "lab_tat" | "radiology" | "radiology_overview" | "radiology_worklist" | "radiology_scheduling" | "radiology_operations" | "radiology_reporting" | "radiology_finalized" | "radiology_exceptions" | "radiology_analytics" | "radiology_admin" | "radiology_template_upload" | "radiology_templates" | "radiology_xray" | "radiology_ct" | "radiology_usg" | "radiology_mri" | "radiology_reports" | "pharmacy" | "pharmacy_dispensing" | "pharmacy_rx" | "pharmacy_ocr" | "pharmacy_returns" | "pharmacy_supplier_returns" | "pharmacy_medicine" | "pharmacy_category" | "pharmacy_suppliers" | "pharmacy_po" | "pharmacy_grn" | "pharmacy_ledger" | "pharmacy_transfers" | "pharmacy_expiry" | "pharmacy_write_off" | "pharmacy_analytics" | "pharmacy_notifications" | "pharmacy_users" | "pharmacy_audit" | "pharmacy_settings" | "surgery" | "billing" | "billing_op" | "billing_ip" | "billing_er" | "billing_unified" | "billing_insured" | "billing_revenue" | "icu" | "icu_micu" | "icu_sicu" | "icu_ccu" | "icu_nicu" | "icu_picu" | "icu_ward" | "discharge" | "triage" | "insurance" | "insurance_overview" | "insurance_desk" | "insurance_board" | "insurance_case" | "insurance_discharge" | "insurance_reports" | "insurance_preauth" | "insurance_eligibility" | "insurance_claims" | "insurance_queries" | "insurance_emails" | "insurance_settlement" | "insurance_gaps" | "insurance_reconciliation" | "insurance_masters" | "insurance_tpas" | "insurance_packages" | "insurance_pricing" | "insurance_docrules" | "insurance_patient_policies" | "insurance_guide" | "insurance_plan" | "insurance_mail_setup" | "insurance_setup" | "analytics" | "reports" | "reports_overview" | "reports_patients" | "reports_op" | "reports_er" | "reports_inpatient" | "reports_appointments" | "reports_doctors" | "reports_pharmacy" | "reports_laboratory" | "reports_radiology" | "reports_beds" | "reports_admissions" | "reports_discharges" | "reports_staff" | "admin" | "admin_doctors" | "chart" | "register" | "outpatient" | "queue" | "op_management" | "op_registration" | "op_workflow" | "op_nurse" | "opd_procedures" | "doctor_workflow" | "doctor_portal" | "scheduling" | "admissions" | "readmission" | "lab_billing" | "payments" | "revenue_reports" | "reports_pharmacy_damaged" | "reports_supplier_returns" | "hrms" | "my_hr" | "employees" | "hr_dashboard" | "hr_attendance" | "hr_staffing" | "hr_leave" | "hr_approvals" | "hr_payroll" | "hr_recruitment" | "hr_organization" | "hr_training" | "hr_performance" | "hr_compliance" | "hr_grievances" | "hr_reports" | "hr_announcements" | "hr_muster" | "hr_biometric" | "hr_timetables" | "hr_audit" | "patient_exp" | "patient_messages" | "registry" | "intelligence" | "ocr" | "dpi_ocr" | "symptom_ai" | "clinical_rag" | "clinical_summaries" | "bulk_ai" | "nl_filtering" | "beds" | "patient360" | "patient360_search"
 
 const HR_MODULE_SECTION_MAP: Record<string, HrSection> = {
   hrms: "dashboard",
@@ -449,34 +448,6 @@ const NAV: NavItem[] = [
       { key: "insurance_reports", label: "Insurance Reports" },
       { key: "insurance_setup", label: "Setup" },
       { key: "insurance_docrules", label: "Audit Log & Rules" },
-    ],
-
-
-  },
-
-  {
-    key: "accounts",
-    label: "Accounts & Finance",
-    Icon: Landmark,
-
-    children: [
-      { key: "accounts", label: "Finance Dashboard", group: "Overview" },
-      { key: "accounts_coa", label: "Chart of Accounts", group: "General Ledger" },
-      { key: "accounts_gl", label: "General Ledger & Journals", group: "General Ledger" },
-      { key: "accounts_receipts", label: "Receipt Vouchers", group: "Vouchers & Cash" },
-      { key: "accounts_payments", label: "Payment Vouchers", group: "Vouchers & Cash" },
-      { key: "accounts_cash_bank", label: "Cash & Bank", group: "Vouchers & Cash" },
-      { key: "accounts_ar", label: "Accounts Receivable (AR)", group: "Sub-Ledgers" },
-      { key: "accounts_ap", label: "Accounts Payable (AP)", group: "Sub-Ledgers" },
-      { key: "accounts_pharmacy", label: "Pharmacy Accounts", group: "Operational Accounts" },
-      { key: "accounts_insurance", label: "Insurance Accounts", group: "Operational Accounts" },
-      { key: "accounts_tax", label: "GST & Tax Setup", group: "Tax & Compliance" },
-      { key: "accounts_budget", label: "Budgeting & Cost Centres", group: "Management" },
-      { key: "accounts_assets", label: "Fixed Assets", group: "Assets" },
-      { key: "accounts_reports", label: "Financial Statements", group: "Reporting" },
-      { key: "accounts_period_close", label: "Period Closing", group: "Closing" },
-      { key: "accounts_audit", label: "Audit & Integrations", group: "Compliance" },
-      { key: "accounts_manager", label: "Finance Manager Hub", group: "Administration" },
     ],
   },
 
@@ -2063,7 +2034,6 @@ export default function App() {
       ROLE_RADIOLOGY_TECHNICIAN: "radiology", ROLE_RADIOLOGIST: "radiology",
       ROLE_RECEPTIONIST: "register", ROLE_FRONT_OFFICE_MANAGER: "register",
       ROLE_BILLING_EXECUTIVE: "billing", ROLE_INSURANCE_TPA_OFFICER: "insurance",
-      ROLE_ACCOUNTANT: "accounts", ROLE_FINANCE_MANAGER: "accounts",
       ROLE_HR_MANAGER: "hrms", ROLE_HR_EXECUTIVE: "hrms", ROLE_COMPLIANCE_OFFICER: "hrms",
     }
     if (isSuperAdminAccount) {
@@ -3507,45 +3477,6 @@ export default function App() {
                 <BillingDashboard onNavigate={(m) => setModule(m as Module)} />
               )}
               {module === "payments" && <PaymentCollection />}
-              {(module === "accounts" || module.startsWith("accounts_")) && (
-                <AccountsModule
-                  initialTab={
-                    module === "accounts_coa"
-                      ? "coa"
-                      : module === "accounts_gl"
-                        ? "gl"
-                        : module === "accounts_receipts"
-                          ? "receipts"
-                          : module === "accounts_payments"
-                            ? "payments"
-                            : module === "accounts_ar"
-                              ? "ar"
-                              : module === "accounts_ap"
-                                ? "ap"
-                                : module === "accounts_cash_bank"
-                                  ? "cash_bank"
-                                  : module === "accounts_pharmacy"
-                                    ? "pharmacy"
-                                    : module === "accounts_insurance"
-                                      ? "insurance"
-                                      : module === "accounts_tax"
-                                        ? "tax"
-                                        : module === "accounts_budget"
-                                          ? "budget"
-                                          : module === "accounts_assets"
-                                            ? "assets"
-                                            : module === "accounts_reports"
-                                              ? "statements"
-                                              : module === "accounts_period_close"
-                                                ? "closing"
-                                                : module === "accounts_audit"
-                                                  ? "audit"
-                                                  : module === "accounts_manager"
-                                                    ? "manager"
-                                                    : "dashboard"
-                  }
-                />
-              )}
               {(module === "radiology" ||
                 module === "radiology_templates" ||
                 module.startsWith("radiology_")) && (

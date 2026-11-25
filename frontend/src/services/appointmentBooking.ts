@@ -1,6 +1,7 @@
 import { db } from "./db"
 import { getDoctorByName, getDoctorConsultationFee } from "./doctorMaster"
 import { notifyAppointmentBooked } from "./patientMessaging"
+import { BillingDatabase } from "./billingDb"
 
 /**
  * Booking an outpatient appointment -- the one place that turns a booking into a
@@ -43,6 +44,17 @@ export interface BookedAppointment {
   token: string
   phone: string
   time: string
+  /** Consultation fee now due in Billing; the patient is held until it is paid. */
+  consultationFee: number
+}
+
+/** Create the pending consultation bill at once, so Billing shows it the moment the appointment is booked. */
+function raiseConsultationBill(encounterId: string): void {
+  try {
+    BillingDatabase.getClaims() // derives the OP bill for every booked visit and saves it
+  } catch (error) {
+    console.warn("Could not raise the consultation bill for", encounterId, error)
+  }
 }
 
 export async function bookAppointment(
@@ -71,6 +83,8 @@ export async function bookAppointment(
       // Stops at "Doctor Assigned": the OP nurse still has to take vitals before
       // the patient is handed to the consulting room.
       status: "Doctor Assigned",
+      // Held at reception until the consultation bill is paid.
+      paymentHold: true,
       chiefComplaint: booking.complaint,
       timestamps: {
         ...(existing?.timestamps || {
@@ -92,7 +106,9 @@ export async function bookAppointment(
       token,
       phone,
       time: booking.time,
+      consultationFee: getDoctorConsultationFee(booking.doctor),
     }
+    raiseConsultationBill(booking.encounterId)
     notifyAppointmentBooked(booked)
     return booked
   }
@@ -117,6 +133,7 @@ export async function bookAppointment(
     room,
     queueToken: token,
     status: "Doctor Assigned",
+    paymentHold: true,
     timestamps: { ...encounter.timestamps, doctorAssigned: booking.time },
   })
 
@@ -131,7 +148,9 @@ export async function bookAppointment(
     token,
     phone: booking.phone,
     time: booking.time,
+    consultationFee: getDoctorConsultationFee(booking.doctor),
   }
+  raiseConsultationBill(encounter.id)
   notifyAppointmentBooked(booked)
   return booked
 }

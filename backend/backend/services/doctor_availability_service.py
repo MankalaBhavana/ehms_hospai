@@ -31,6 +31,9 @@ logger = logging.getLogger(__name__)
 HOSPITAL_TIMEZONE = ZoneInfo("Asia/Kolkata")
 DEFAULT_MAX_WORKLOAD = 15
 
+# Key inside doctors.weekly_schedules that holds a doctor's additional daily time slots.
+EXTRA_SLOTS_KEY = "_extra_slots"
+
 
 def log_audit_event(action, module_name, entity_id, actor="system", details=None):
     """Record an administrative or assignment event in the audit trail."""
@@ -161,11 +164,11 @@ def get_doctor_record(
                 _to_sql_params("""
                     SELECT * FROM users
                     WHERE (employee_id = ? OR username = ? OR LOWER(full_name) = LOWER(?))
-                      AND job_role ILIKE '%doctor%'
+                      AND job_role ILIKE ?
                       AND (hospital_id = ? OR hospital_id IS NULL)
                     ORDER BY id ASC LIMIT 1
                 """),
-                (ident_str, ident_str, ident_str, scoped_id),
+                (ident_str, ident_str, ident_str, "%doctor%", scoped_id),
             )
             user_row = cursor.fetchone()
 
@@ -553,15 +556,31 @@ def check_doctor_duty_schedule(
             "end_time": day_end,
             "is_overnight": day_overnight,
         }
-    else:
-        return False, {
-            "scheduled": False,
-            "source": "weekly_default",
-            "reason": f"Outside shift hours ({day_start} - {day_end})",
-            "shift": day_shift,
-            "start_time": day_start,
-            "end_time": day_end,
-        }
+    # Additional daily slots a doctor added (stored under a reserved key beside the weekday entries).
+    for extra in weekly_schedules.get(EXTRA_SLOTS_KEY) or []:
+        try:
+            ex_start = normalize_time_str(extra.get("start"))
+            ex_end = normalize_time_str(extra.get("end"))
+        except Exception:
+            continue
+        if is_time_within_shift(time_str, ex_start, ex_end, is_overnight=ex_start > ex_end):
+            return True, {
+                "scheduled": True,
+                "source": "extra_slot",
+                "shift": day_shift,
+                "start_time": ex_start,
+                "end_time": ex_end,
+                "is_overnight": ex_start > ex_end,
+            }
+
+    return False, {
+        "scheduled": False,
+        "source": "weekly_default",
+        "reason": f"Outside shift hours ({day_start} - {day_end})",
+        "shift": day_shift,
+        "start_time": day_start,
+        "end_time": day_end,
+    }
 
 
 def get_doctor_current_workload(

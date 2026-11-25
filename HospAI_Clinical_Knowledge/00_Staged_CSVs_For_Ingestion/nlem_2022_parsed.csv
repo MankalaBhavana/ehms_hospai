@@ -1,0 +1,702 @@
+category,medicine_name,level,form_strength
+1.1 General Anaesthetics and Oxygen,Halothane,"S,T",Liquid for inhalation
+1.1 General Anaesthetics and Oxygen,Isoflurane,"S,T",Liquid for inhalation
+1.1 General Anaesthetics and Oxygen,Ketamine,"P,S,T",Injection 10 mg/mL
+1.1 General Anaesthetics and Oxygen,Ketamine,"P,S,T",Injection 50 mg/mL
+1.1 General Anaesthetics and Oxygen,Nitrous oxide,"P,S,T",As licensed for medical purpose
+1.1 General Anaesthetics and Oxygen,Propofol,"P,S,T",Injection 10 mg/mL
+1.1 General Anaesthetics and Oxygen,Sevoflurane,"S,T",Liquid for inhalation
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Powder for injection 0.5 g
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Injection 0.25 %
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Injection 0.5 %
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Injection 0.5 % with 7.5 % glucose
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Injection 1 %
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Injection 2 %
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Injection 5 % with 7.5 % glucose
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Injection 1% (A) + 1:200000
+1.1 General Anaesthetics and Oxygen,Thiopentone,"P,S,T",Injection 2% (A) + 1:200000
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Glycopyrrolate,"S,T",Injection 0.2 mg/mL
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Glycopyrrolate,"S,T",Tablet 7.5 mg
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Glycopyrrolate,"S,T",Injection 1 mg/mL
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Glycopyrrolate,"S,T",Injection 5 mg/mL
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Glycopyrrolate,"S,T",Injection 15 mg/mL
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Atracurium,"S,T",Injection 10 mg/mL
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Baclofen,"S,T",Tablet 5 mg
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Baclofen,"S,T",Tablet 10 mg
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Baclofen,"S,T",Tablet 20 mg
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Baclofen,"S,T",Injection 0.5 mg/mL
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Succinylcholine,"S,T",Injection 50 mg/mL
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Vecuronium,"S,T",Powder for injection 4 mg
+1.3 Preoperative Medication and Sedation for Short Term Procedures,Vecuronium,"S,T",Tablet 300 mg to 500 mg
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Diclofenac,"P,S,T",Tablet 50 mg
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Diclofenac,"P,S,T",Injection 25 mg/mL
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Diclofenac,"P,S,T",Tablet 400 mg
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Diclofenac,"P,S,T",Oral liquid 100 mg/5 mL (p)
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Tablet 250 mg
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Oral liquid 100 mg/5 mL (p)
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Tablet 650 mg
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Oral liquid 120 mg/5 mL (p)
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Oral Liquid 125 mg/5 mL (p)
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Oral Liquid 250 mg/5 mL (p)
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Injection 150 mg/ mL
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Suppository 80 mg
+"2.1 Non-opioid Analgesics, Antipyretics and Non-steroidal Anti- inflammatory Drugs",Mefenamic acid,"P,S,T",Suppository 170 mg
+2.2 Opioid Analgesics,Fentanyl,"S,T",Injection 50 mcg/mL
+2.2 Opioid Analgesics,Fentanyl,"S,T",Injection 10 mg/mL
+2.2 Opioid Analgesics,Fentanyl,"S,T",Injection 15 mg/mL
+2.2 Opioid Analgesics,Fentanyl,"S,T",Capsule 100 mg
+2.2 Opioid Analgesics,Fentanyl,"S,T",Injection 50 mg/mL
+2.2 Opioid Analgesics,Fentanyl,"S,T",Tablet 300 mg
+2.3 Medicines used to treat Gout,Colchicine,"P,S,T",Tablet 0.5 mg
+2.3 Medicines used to treat Gout,Colchicine,"P,S,T",Tablet 50 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Hydroxychloroquine,"P,S,T",Tablet 200 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Hydroxychloroquine,"P,S,T",Tablet 400 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Hydroxychloroquine,"P,S,T",Tablet 5 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Hydroxychloroquine,"P,S,T",Tablet 10 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Sulfasalazine,"S,T",Tablet 500 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Adrenaline,"P,S,T",Injection 1 mg/mL
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Tablet 10 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Oral liquid 5 mg/5 mL (p)
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Tablet 0.5 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Tablet 2 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Tablet 4 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Oral liquid 0.5 mg/5 mL (p)
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Injection 4 mg/mL
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Tablet 5 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Cetirizine,"P,S,T",Tablet 10 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Pheniramine,"P,S,T",Injection 22.75 mg/mL
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Pheniramine,"P,S,T",Tablet 5 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Pheniramine,"P,S,T",Tablet 10 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Pheniramine,"P,S,T",Tablet 20 mg
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Pheniramine,"P,S,T",Oral liquid 5 mg/5 mL (p)
+2.4 Disease Modifying Agents used in Rheumatoid Disorders,Pheniramine,"P,S,T",Oral liquid 15 mg/5 mL (p)
+4.1 Nonspecific,Activated Charcoal,"P,S,T",Powder (as licensed)
+4.1 Nonspecific,D- Penicillamine,"P,S,T",Capsule 150 mg (p)
+4.1 Nonspecific,D- Penicillamine,"P,S,T",Capsule 250 mg
+4.1 Nonspecific,Desferrioxamine,"S,T",Powder for injection 500 mg
+4.1 Nonspecific,N-acetylcysteine,"P,S,T",Sachet 200 mg
+4.1 Nonspecific,N-acetylcysteine,"P,S,T",Injection 200 mg/mL
+4.1 Nonspecific,Naloxone,"P,S,T",Injection 0.4 mg/mL
+4.1 Nonspecific,Sodium nitrite,"S,T",Injection 30 mg/mL
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Injection 250 mg/mL
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 100 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 200 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 400 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 200 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 400 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Oral liquid 100 mg/5 mL (p)
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 5 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 10 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Oral liquid 2 mg/5 mL (p)
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Injection 5 mg/mL
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Suppository 5 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 250 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 500 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 750 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Oral liquid 100 mg/mL (p)
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Injection 100 mg/mL
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 1 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Tablet 2 mg
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Injection 2 mg/mL
+4.1 Nonspecific,Sodium thiosulphate,"S,T",Injection 4 mg/mL
+4.1 Nonspecific,Magnesium sulphate,"S,T",Injection 500 mg/mL
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 7.5 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 15 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Injection 5 mg/mL
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 30 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 60 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Oral liquid 20 mg/5 mL (p)
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 50 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 100 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 300 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Oral liquid 30 mg/5 mL (p)
+4.1 Nonspecific,Magnesium sulphate,"S,T",Oral liquid 125 mg/5 mL (p)
+4.1 Nonspecific,Magnesium sulphate,"S,T",Injection 25 mg/mL
+4.1 Nonspecific,Magnesium sulphate,"S,T",Injection 50 mg/mL
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 200 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 300 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 500 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 300 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 500 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Oral liquid 200 mg/5 mL (p)
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 300 mg to 500 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 200 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 400 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Oral liquid 100 mg/5 mL (p)
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 500 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Tablet 650 mg
+4.1 Nonspecific,Magnesium sulphate,"S,T",Oral liquid 120 mg/5mL (p)
+4.1 Nonspecific,Magnesium sulphate,"S,T",Oral Liquid 125 mg/5mL (p)
+4.1 Nonspecific,Magnesium sulphate,"S,T",Oral Liquid 250 mg/5mL (p)
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 25 mg
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 50 mg
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 25 mg
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 75 mg
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 10 mg
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 10 mg
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 20 mg
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 40 mg
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 100 mg (A) + 10 mg (B)
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 100 mg (A) + 25 mg (B)
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 250 mg (A) + 25 mg (B)
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 100 mg (A) + 25 mg (B)
+4.1 Nonspecific,Sumatriptan,"P,S,T",Tablet 200 mg (A) + 50 mg (B)
+4.1 Nonspecific,Trihexyphenidyl,"P,S,T",Tablet 2 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 5 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 10 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 400 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 200 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 100 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 100 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 400 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 200 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 50 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 100 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 120 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 12 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 250 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 500 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 125 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 250 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 500 mg (A) + 125 mg (B)
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 200 mg (A) + 28.5  mg (B)/5 mL
+4.1 Nonspecific,Donepezil,"S,T",Injection 1000 mg
+4.1 Nonspecific,Donepezil,"S,T",Injection 12 lac units Powder for injection 24
+4.1 Nonspecific,Donepezil,"S,T",Tablet 100 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 125 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 200 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 400 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 50 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 100 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Capsule 250 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 500 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral Liquid 125 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 250 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 500 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 200 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 500 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 125 mg/ 5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Injection 1500 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 250 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 500 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 250 mg/ 5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Injection 200 mg/ 100 mL
+4.1 Nonspecific,Donepezil,"S,T",Tablet 250 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 500 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 125 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Capsule 150 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 300 mg
+4.1 Nonspecific,Donepezil,"S,T",Injection 150 mg /mL
+4.1 Nonspecific,Donepezil,"S,T",Tablet 400 mg (A) + 80 mg (B)
+4.1 Nonspecific,Donepezil,"S,T",Tablet 800 mg (A) + 160 mg (B)
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 200 mg (A) + 40 mg  (B)/5 mL
+4.1 Nonspecific,Donepezil,"S,T",Capsule 100 mg
+4.1 Nonspecific,Donepezil,"S,T",Injection 40 mg/mL
+4.1 Nonspecific,Donepezil,"S,T",Tablet 200 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 400 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 200 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Injection 500 mg/100 mL
+4.1 Nonspecific,Donepezil,"S,T",Tablet 100 mg
+4.1 Nonspecific,Donepezil,"S,T",Oral liquid 25 mg/5 mL (p)
+4.1 Nonspecific,Donepezil,"S,T",Capsule 125 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 250 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 50 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 100 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 50 mg
+4.1 Nonspecific,Donepezil,"S,T",Tablet 100 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 150 mg
+4.1 Nonspecific,Donepezil,"S,T",Capsule 300 mg
+4.1 Nonspecific,Donepezil,"S,T",Injection 100 mg/mL
+4.1 Nonspecific,Donepezil,"S,T",Injection 250 mg/mL
+4.1 Nonspecific,Donepezil,"S,T",Injection 500 mg/mL
+6.4 Antituberculosis Medicines,Bedaquiline,T,Tablet 100 mg
+6.4 Antituberculosis Medicines,Bedaquiline,T,Tablet 250 mg
+6.4 Antituberculosis Medicines,Bedaquiline,T,Tablet 500 mg
+6.4 Antituberculosis Medicines,Bedaquiline,T,Tablet 750 mg
+6.4 Antituberculosis Medicines,Bedaquiline,T,Capsule 100 mg
+6.4 Antituberculosis Medicines,Bedaquiline,T,Capsule 125 mg
+6.4 Antituberculosis Medicines,Bedaquiline,T,Capsule 250 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 50 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 200 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 400 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 600 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 800 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 125 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 250 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 100 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 300 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Oral Liquid 50 mg/5 mL (p)
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 250 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 500 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 750 mg
+6.4 Antituberculosis Medicines,Delamanid,T,Tablet 300 mg
+6.4 Antituberculosis Medicines,Linezolid,"P,S,T",Tablet 600 mg
+6.4 Antituberculosis Medicines,Moxifloxacin,"P,S,T",Tablet 400 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Granules (As licensed)
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Tablet 500 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Tablet 750 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Tablet 1000 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Tablet 1500 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Oral liquid 250 mg/5 mL (p)
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Capsule 150 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Capsule 300 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Capsule 450 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Capsule 600 mg
+6.4 Antituberculosis Medicines,Para- aminosalicylic acid,"S,T",Oral liquid 100 mg/ 5 mL (p)
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Powder for Injection 750 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Injection 50 mg/vial
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Injection 50 mg/vial
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Tablet 50 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Tablet 100 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Tablet 150 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Tablet 200 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Tablet 400 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Oral liquid 50 mg/ 5 mL (p)
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Tablet 125 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Tablet 250 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Tablet 375 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Capsule 100 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Capsule 200 mg
+6.4 Antituberculosis Medicines,Streptomycin,"P,S,T",Oral liquid 10 mg/mL
+6.5 Antifungal Medicines,Mupirocin,"P,S,T",Ointment 2%
+6.5 Antifungal Medicines,Nystatin,"S,T",Pessary 1 Lac IU
+6.5 Antifungal Medicines,Nystatin,"S,T",Oral Liquid 1 Lac IU/mL (p)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Cream 1%
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 200 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 400 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 800 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Injection 500 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Oral liquid 400 mg/5 mL (p)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 450 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 300 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 600 mg (A) + 300 mg (B)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 150 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 300 mg (A) + 300 mg (B)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 300 mg (A) + 300 mg (B)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 300 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Oral liquid 50 mg/5 mL (p)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 300 mg (A) + 150 mg (B)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 60 mg (A) + 30 mg (B) + 50 mg (C)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 300 mg (A) + 150 mg (B)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 600 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 200 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Oral liquid 50 mg/ 5 mL (p)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 100 mg (A) + 25 mg (B)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 200 mg (A) + 50 mg (B)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Oral Liquid 80 mg (A) + 20 mg (B) /mL (p)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Capsule/ Sachet (containing  pellets/granules)
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 30 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 60 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 0.5 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Tablet 1 mg
+6.5 Antifungal Medicines,Terbinafine,"P,S,T",Oral liquid 0.05 mg/mL (p)
+6.7 Medicines used in the Management of HIV,Ribavirin,"S,T",Capsule 200 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 400 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 25 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 300 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 200 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 400 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Injection 500 mg/100 mL
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Oral liquid 200 mg/5 mL (p)
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Injection 50 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Capsule 300 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 400 mg ( A) + 80 mg (B)  Tablet 800
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 40 mg (A) + 240 mg (B)
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 80 mg (A) + 480 mg (B)
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 150 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Oral liquid 50 mg/5 mL
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Capsule 150 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Capsule 300 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 2.5 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 7.5 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 15 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 300 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Injection 300 mg/mL
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Capsule 100 mg
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Oral liquid 50 mg/ 5mL
+6.7 Medicines used in the Management of HIV,Sofosbuvir,"S,T",Tablet 250 mg
+7.1 Antineoplastic medicines,Actinomycin D,T,Powder for Injection 0.5 mg
+7.1 Antineoplastic medicines,All-trans retinoic acid,T,Capsule 10 mg
+7.1 Antineoplastic medicines,Arsenic trioxide,T,Injection 1mg/ mL
+7.1 Antineoplastic medicines,Bendamustine hydrochloride,T,Injection 25 mg/ vial
+7.1 Antineoplastic medicines,Bendamustine hydrochloride,T,Injection 100 mg/vial
+7.1 Antineoplastic medicines,Bleomycin,T,Powder for Injection 15 units
+7.1 Antineoplastic medicines,Bortezomib,T,Powder for Injection 2 mg
+7.1 Antineoplastic medicines,Calcium folinate,T,Tablet 15 mg
+7.1 Antineoplastic medicines,Calcium folinate,T,Injection 3 mg/mL
+7.1 Antineoplastic medicines,Capecitabine,T,Tablet 500 mg
+7.1 Antineoplastic medicines,Carboplatin,T,Injection 10 mg/mL
+7.1 Antineoplastic medicines,Chlorambucil,T,Tablet 2 mg
+7.1 Antineoplastic medicines,Chlorambucil,T,Tablet 5 mg
+7.1 Antineoplastic medicines,Cisplatin,T,Injection 1mg/mL
+7.1 Antineoplastic medicines,Cyclophosphamide,T,Tablet 50 mg
+7.1 Antineoplastic medicines,Cyclophosphamide,T,Injection 100 mg/vial
+7.1 Antineoplastic medicines,Cyclophosphamide,T,Injection 500 mg/vial
+7.1 Antineoplastic medicines,Cyclophosphamide,T,Injection 1000 mg/vial
+7.1 Antineoplastic medicines,Dacarbazine,T,Powder for Injection 200 mg
+7.1 Antineoplastic medicines,Daunorubicin,T,Injection 5 mg/mL
+7.1 Antineoplastic medicines,Docetaxel,T,Powder for Injection 20 mg
+7.1 Antineoplastic medicines,Doxorubicin,T,Injection 2 mg/mL
+7.1 Antineoplastic medicines,Etoposide,T,Capsule 50 mg
+7.1 Antineoplastic medicines,Etoposide,T,Injection 20 mg/mL
+7.1 Antineoplastic medicines,Gefitinib,T,Tablet 250 mg
+7.1 Antineoplastic medicines,Gemcitabine,T,Powder for Injection 200 mg  Powder for
+7.1 Antineoplastic medicines,Gemcitabine,T,Injection 1000 mg
+7.1 Antineoplastic medicines,Ifosfamide,T,Powder for Injection 1000 mg Powder for
+7.1 Antineoplastic medicines,Ifosfamide,T,Injection 2000 mg
+7.1 Antineoplastic medicines,Imatinib,T,Tablet 100 mg
+7.1 Antineoplastic medicines,Imatinib,T,Tablet 400 mg
+7.1 Antineoplastic medicines,Irinotecan HCl trihydrate,T,Solution for injection 20 mg/ mL
+7.1 Antineoplastic medicines,L-Asparaginase,T,Powder for Injection 5000 KU  Powder for
+7.1 Antineoplastic medicines,L-Asparaginase,T,Injection 10000 KU
+7.1 Antineoplastic medicines,Lenalidomide,T,Capsule 5 mg
+7.1 Antineoplastic medicines,Lenalidomide,T,Capsule 25 mg
+7.1 Antineoplastic medicines,Melphalan,T,Tablet 2 mg
+7.1 Antineoplastic medicines,Melphalan,T,Tablet 5 mg
+7.1 Antineoplastic medicines,Melphalan,T,Tablet 2.5 mg
+7.1 Antineoplastic medicines,Melphalan,T,Tablet 5 mg
+7.1 Antineoplastic medicines,Melphalan,T,Tablet 10 mg
+7.1 Antineoplastic medicines,Melphalan,T,Injection 50 mg/mL
+7.1 Antineoplastic medicines,Oxaliplatin,T,Injection 5 mg/mL in 10 mL vial  Injection 5
+7.1 Antineoplastic medicines,Paclitaxel,T,Injection 30 mg/5 mL
+7.1 Antineoplastic medicines,Paclitaxel,T,Injection 100 mg/16.7 mL
+7.1 Antineoplastic medicines,Rituximab,T,Injection 10 mg/mL
+7.1 Antineoplastic medicines,Temozolomide,T,Capsule 20 mg
+7.1 Antineoplastic medicines,Temozolomide,T,Capsule 100 mg
+7.1 Antineoplastic medicines,Temozolomide,T,Capsule 250 mg
+7.1 Antineoplastic medicines,Temozolomide,T,Capsule 50 mg
+7.1 Antineoplastic medicines,Temozolomide,T,Capsule 100 mg
+7.1 Antineoplastic medicines,Trastuzumab,T,Injection 440 mg/50 mL
+7.1 Antineoplastic medicines,Vinblastine,T,Injection 1 mg/mL
+7.1 Antineoplastic medicines,Vincristine,T,Injection 1 mg/mL
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Bicalutamide,T,Tablet 50 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Letrozole,T,Tablet 2.5 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Letrozole,T,Tablet 10 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Letrozole,T,Tablet 20 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Letrozole,T,Tablet 40 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Letrozole,T,Oral liquid 5 mg/5 mL (p)
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Letrozole,T,Oral liquid 15 mg/5 mL (p)
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Letrozole,T,Injection 20 mg/2 mL
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Tamoxifen,T,Tablet 10 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Tamoxifen,T,Tablet 20 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Tamoxifen,T,Capsule 25 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Tamoxifen,T,Capsule 50 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Tamoxifen,T,Capsule 100 mg
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Tamoxifen,T,Oral liquid 100 mg/mL (p)
+7.2 Hormones and Anti-hormones used in Cancer Therapy,Tamoxifen,T,Injection 50 mg/mL
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Tablet 250 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Tablet 500 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Capsule 0.5 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Capsule 1 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Capsule 2 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Tablet 25 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Tablet 0.5 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Tablet 4 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Injection 4 mg/mL
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Tablet 2 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Tablet 5 mg
+7.3 Immunosuppressive Medicines,Mycophenolate  mofetil,T,Injection 5 mg/mL
+7.4 Medicines used in Palliative Care,Filgrastim,T,Injection 300 mcg
+7.4 Medicines used in Palliative Care,Filgrastim,T,Tablet 1.5 mg
+7.4 Medicines used in Palliative Care,Filgrastim,T,Tablet 5 mg
+7.4 Medicines used in Palliative Care,Filgrastim,T,Injection 5 mg/mL
+7.4 Medicines used in Palliative Care,Loperamide,"S,T",Tablet 2 mg
+7.4 Medicines used in Palliative Care,Loperamide,"S,T",Tablet 10 mg
+7.4 Medicines used in Palliative Care,Loperamide,"S,T",Oral liquid 5 mg/5 mL (p)
+7.4 Medicines used in Palliative Care,Loperamide,"S,T",Injection 5 mg/mL
+7.4 Medicines used in Palliative Care,Mesna,T,Injection 100 mg/mL
+7.4 Medicines used in Palliative Care,Mesna,T,Tablet 10 mg
+7.4 Medicines used in Palliative Care,Mesna,T,Tablet 4 mg
+7.4 Medicines used in Palliative Care,Mesna,T,Tablet 8 mg
+7.4 Medicines used in Palliative Care,Mesna,T,Oral liquid 2 mg/5 mL (p)
+7.4 Medicines used in Palliative Care,Mesna,T,Injection 2 mg/mL
+7.4 Medicines used in Palliative Care,Mesna,T,Capsule 50 mg
+7.4 Medicines used in Palliative Care,Mesna,T,Capsule 100 mg
+7.4 Medicines used in Palliative Care,Mesna,T,Injection 50 mg/mL
+7.4 Medicines used in Palliative Care,Zoledronic acid,T,Powder for Injection 4 mg
+8.1 Antianaemia Medicines,Erythropoietin,"S,T",Injection 2000 IU/mL
+8.1 Antianaemia Medicines,Erythropoietin,"S,T",Injection 10000 IU/mL
+8.1 Antianaemia Medicines,Erythropoietin,"S,T",Tablet equivalent to 60 mg of elemental iron
+8.1 Antianaemia Medicines,Erythropoietin,"S,T",Injection 50 mg/mL
+8.1 Antianaemia Medicines,Erythropoietin,"S,T",Injection 50 mg/mL
+8.1 Antianaemia Medicines,Erythropoietin,"S,T",Tablet 45 mg elemental iron (A)
+8.1 Antianaemia Medicines,Erythropoietin,"S,T",Tablet 100 mg elemental iron
+8.1 Antianaemia Medicines,Erythropoietin,"S,T",Oral liquid 20 mg elemental iron
+8.1 Antianaemia Medicines,Folic Acid,"P,S,T",Tablet 1 mg
+8.1 Antianaemia Medicines,Folic Acid,"P,S,T",Tablet 5 mg
+8.1 Antianaemia Medicines,Hydroxocobalamin,"P,S,T",Injection 1 mg/mL
+8.1 Antianaemia Medicines,Iron sucrose,"S,T",Injection 20 mg/mL
+8.1 Antianaemia Medicines,Iron sucrose,"S,T",Injection 60 mg/ 0.6 mL
+8.1 Antianaemia Medicines,Iron sucrose,"S,T",Injection 5000 IU/mL
+8.1 Antianaemia Medicines,Iron sucrose,"S,T",Injection 10 mg/mL
+8.2 Medicines affecting Coagulation,Protamine Sulphate,"S,T",Injection 10 mg/mL
+8.2 Medicines affecting Coagulation,Tranexamic acid,"P,S,T",Tablet 500 mg
+8.2 Medicines affecting Coagulation,Tranexamic acid,"P,S,T",Injection 100 mg/mL
+8.2 Medicines affecting Coagulation,Tranexamic acid,"P,S,T",Tablet 1 mg
+8.2 Medicines affecting Coagulation,Tranexamic acid,"P,S,T",Tablet 2 mg
+8.2 Medicines affecting Coagulation,Tranexamic acid,"P,S,T",Tablet 3 mg
+8.2 Medicines affecting Coagulation,Tranexamic acid,"P,S,T",Tablet 5 mg
+9.1 Blood and Blood components,Fresh frozen  plasma,"S,T",As licensed
+9.1 Blood and Blood components,Red blood cells/ Packed RBCs,"S,T",As licensed
+9.1 Blood and Blood components,Whole blood,"S,T",As licensed
+9.3 Plasma fractions for specific use,Coagulation factor IX,"S,T",Powder for Injection 600 IU
+9.3 Plasma fractions for specific use,Coagulation factor VIII,"S,T",Powder for Injection 250 IU
+9.3 Plasma fractions for specific use,Cryoprecipitate,"S,T",As licensed
+9.3 Plasma fractions for specific use,Cryoprecipitate,"S,T",Tablet 30 mg
+9.3 Plasma fractions for specific use,Cryoprecipitate,"S,T",Tablet 60 mg
+10.1 Medicines used in Angina,Isosorbide dinitrate,"P,S,T",Tablet 5 mg
+10.1 Medicines used in Angina,Isosorbide dinitrate,"P,S,T",Tablet 10 mg
+10.1 Medicines used in Angina,Isosorbide dinitrate,"P,S,T",Tablet 25 mg
+10.1 Medicines used in Angina,Isosorbide dinitrate,"P,S,T",Tablet 50 mg
+10.1 Medicines used in Angina,Isosorbide dinitrate,"P,S,T",Tablet 100 mg
+10.2 Antiarrhythmic medicines,Adenosine,"S,T",Injection 3 mg/mL
+10.2 Antiarrhythmic medicines,Adenosine,"S,T",Tablet 100 mg
+10.2 Antiarrhythmic medicines,Adenosine,"S,T",Tablet 200 mg
+10.2 Antiarrhythmic medicines,Adenosine,"S,T",Injection 50 mg/mL
+10.2 Antiarrhythmic medicines,Adenosine,"S,T",Tablet 0.25 mg
+10.2 Antiarrhythmic medicines,Adenosine,"S,T",Oral liquid 0.05 mg/mL
+10.2 Antiarrhythmic medicines,Adenosine,"S,T",Injection 0.25 mg/mL
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Injection 10 mg/mL
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 40 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 80 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Injection 2.5 mg/ mL
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 2.5 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 5 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 10 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 2.5 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 5 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 12.5 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 25 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 100 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 2.5 mg
+10.2 Antiarrhythmic medicines,Esmolol,"S,T",Tablet 5 mg
+10.3 Antihypertensive Medicines,Sodium nitroprusside,"S,T",Injection 10 mg/mL
+10.3 Antihypertensive Medicines,Sodium nitroprusside,"S,T",Tablet 20 mg
+10.3 Antihypertensive Medicines,Sodium nitroprusside,"S,T",Tablet 40 mg
+10.3 Antihypertensive Medicines,Sodium nitroprusside,"S,T",Tablet 80 mg
+10.3 Antihypertensive Medicines,Sodium nitroprusside,"S,T",Tablet 0.25 mg
+10.3 Antihypertensive Medicines,Sodium nitroprusside,"S,T",Oral liquid 0.05 mg/mL
+10.3 Antihypertensive Medicines,Sodium nitroprusside,"S,T",Injection 0.25 mg/mL
+10.4 Medicines used in Shock and Heart failure,Dobutamine,"S,T",Injection 50 mg/mL
+10.4 Medicines used in Shock and Heart failure,Dopamine,"S,T",Injection 40 mg/mL
+10.4 Medicines used in Shock and Heart failure,Noradrenaline,"S,T",Injection 2 mg/mL
+10.4 Medicines used in Shock and Heart failure,Noradrenaline,"S,T",Tablet 50 mg
+10.5 Antiplatelet and Antithrombotic Medicines,Clopidogrel,"P,S,T",Tablet 75 mg
+10.5 Antiplatelet and Antithrombotic Medicines,Clopidogrel,"P,S,T",Tablet 150 mg
+10.5 Antiplatelet and Antithrombotic Medicines,Clopidogrel,"P,S,T",Tablet 110 mg
+10.5 Antiplatelet and Antithrombotic Medicines,Clopidogrel,"P,S,T",Tablet 150 mg
+10.5 Antiplatelet and Antithrombotic Medicines,Clopidogrel,"P,S,T",Injection 60 mg/ 0.6 mL
+10.5 Antiplatelet and Antithrombotic Medicines,Clopidogrel,"P,S,T",Injection 5000 IU/mL
+10.5 Antiplatelet and Antithrombotic Medicines,Streptokinase,"S,T","Injection 750,000 IU"
+10.5 Antiplatelet and Antithrombotic Medicines,Streptokinase,"S,T","Injection 15,00,000 IU"
+10.5 Antiplatelet and Antithrombotic Medicines,Streptokinase,"S,T",Injection 30 mg/vial
+10.5 Antiplatelet and Antithrombotic Medicines,Streptokinase,"S,T",Injection 40 mg/vial
+10.5 Antiplatelet and Antithrombotic Medicines,Streptokinase,"S,T",Tablet 10 mg
+10.5 Antiplatelet and Antithrombotic Medicines,Streptokinase,"S,T",Tablet 20 mg
+10.5 Antiplatelet and Antithrombotic Medicines,Streptokinase,"S,T",Tablet 40 mg
+10.5 Antiplatelet and Antithrombotic Medicines,Streptokinase,"S,T",Tablet 80 mg
+11.2 Antibacterial Medicines,Framycetin,"P,S,T",Cream 1 %
+11.2 Antibacterial Medicines,Fusidic acid,"P,S,T",Cream 2 %
+11.2 Antibacterial Medicines,Silver sulphadiazine,"P,S,T",Cream 1 %
+11.3 Antiinflammatory and Antipruritic Medicines,Calamine,"P,S,T",Lotion (As per IP)
+11.4 Keratolytic agents,Benzoyl peroxide,"P,S,T",Gel 2.5 % - 5 %
+11.4 Keratolytic agents,Podophyllin resin,"S,T",Solution 20 %
+11.4 Keratolytic agents,Salicylic acid,"P,S,T",Ointment 3-6 %
+11.5 Scabicides and Pediculicides,Permethrin,"P,S,T",Lotion 1 %
+12.1 Ophthalmic Medicines,Fluorescein,"S,T",Ophthalmic Strips
+12.2 Radiocontrast Media,Barium sulphate,"S,T",Oral Liquid 95% w/v
+12.2 Radiocontrast Media,Iohexol,"S,T",Injection 140 to 350 mg iodine/mL
+12.2 Radiocontrast Media,Iohexol,"S,T",Injection 60 % w/v
+12.2 Radiocontrast Media,Iohexol,"S,T",Injection 76 % w/v
+12.2 Radiocontrast Media,Haemodialysis fluid,"S,T",As licensed
+12.2 Radiocontrast Media,Peritoneal dialysis solution,"S,T",As licensed
+12.2 Radiocontrast Media,Chlorhexidine,"P,S,T",Solution 5% (Concentrate)
+12.2 Radiocontrast Media,Ethyl alcohol (Denatured),"P,S,T",Solution 70%
+12.2 Radiocontrast Media,Hydrogen peroxide,"P,S,T",Solution 6 %
+12.2 Radiocontrast Media,Glutaraldehyde,"S,T",As Licensed
+12.2 Radiocontrast Media,Potassium permanganate,"P,S,T",Crystals for topical solution
+12.2 Radiocontrast Media,Potassium permanganate,"P,S,T",Tablet 40 mg
+12.2 Radiocontrast Media,Potassium permanganate,"P,S,T",Oral liquid 10 mg/mL
+12.2 Radiocontrast Media,Potassium permanganate,"P,S,T",Injection 10 mg/ mL
+12.2 Radiocontrast Media,Potassium permanganate,"P,S,T",Tablet 50 mg
+12.2 Radiocontrast Media,Mannitol,"P,S,T",Injection 10 %
+12.2 Radiocontrast Media,Mannitol,"P,S,T",Injection 20 %
+12.2 Radiocontrast Media,Mannitol,"P,S,T",Tablet 50 mg
+12.2 Radiocontrast Media,Xylometazoline,"P,S,T",Nasal drops 0.05 %
+12.2 Radiocontrast Media,Xylometazoline,"P,S,T",Capsule 10 mg
+12.2 Radiocontrast Media,Xylometazoline,"P,S,T",Capsule 20 mg
+12.2 Radiocontrast Media,Xylometazoline,"P,S,T",Capsule 40 mg
+17.1 Antiulcer Medicines,Pantoprazole,"S,T",Injection 40 mg
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Tablet 10 mg
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Oral Liquid 1 mg/mL
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Injection 5 mg/mL
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Tablet 4 mg
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Oral Liquid 2 mg/5 mL (p)
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Injection 2 mg/ mL
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Tablet 400 mg
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Suppository 500 mg
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Tablet 10 mg
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Oral Solution 10 mg/5mL
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Injection 10 mg/ mL
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Tablet 100 mg
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Injection 20 mg/ mL
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Tablet 5 mg
+17.1 Antiulcer Medicines,Domperidone,"P,S,T",Suppository 5 mg
+5 aminosalicylic acid,Ispaghula,"P,S,T",Granules/ Husk/ Powder
+5 aminosalicylic acid,Zinc Sulphate,"P,S,T",Dispersible Tablet 20 mg
+5 aminosalicylic acid,Somatostatin,T,Powder for Injection 3 mg
+5 aminosalicylic acid,Somatostatin,T,Injection 4 mg/mL
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 0.1 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 5 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 10 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 20 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 5 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 10 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 20 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Oral liquid 5 mg/5 mL (p)
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Oral liquid 15 mg/5 mL (p)
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 1.5 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 1 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 2 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Injection 40 IU/mL
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 500 mg
+18.1 Adrenal Hormones and Synthetic substitutes,Fludrocortisone,"S,T",Tablet 1000 mg
+18.4 Ovulation Inducers,Clomiphene citrate,T,Tablet 50 mg
+18.4 Ovulation Inducers,Clomiphene citrate,T,Tablet 100 mg
+18.4 Ovulation Inducers,Clomiphene citrate,T,Injection 2000 IU
+18.4 Ovulation Inducers,Clomiphene citrate,T,Injection 5000 IU
+18.4 Ovulation Inducers,Clomiphene citrate,T,Injection 10000 IU
+18.4 Ovulation Inducers,Clomiphene citrate,T,Tablet 5 mg
+18.4 Ovulation Inducers,Clomiphene citrate,T,Tablet 10 mg
+18.4 Ovulation Inducers,Clomiphene citrate,T,Injection 150 mg/ mL
+18.5 Progestogens,Norethisterone,"P,S,T",Tablet 5 mg
+18.5 Progestogens,Norethisterone,"P,S,T",Tablet 5 mg
+18.5 Progestogens,Norethisterone,"P,S,T",Tablet 10 mg
+18.5 Progestogens,Norethisterone,"P,S,T",Tablet 20 mg
+18.5 Progestogens,Norethisterone,"P,S,T",Tablet 12.5 mcg to 150 mcg*
+19.2 Sera and Immunoglobulins (Liquid/ Lyophilized),Anti-rabies immunoglobulin,"P,S,T",As Licensed
+19.2 Sera and Immunoglobulins (Liquid/ Lyophilized),Anti-D immunoglobulin,"S,T",As Licensed
+19.2 Sera and Immunoglobulins (Liquid/ Lyophilized),Diphtheria antitoxin,"P,S,T",As Licensed
+19.2 Sera and Immunoglobulins (Liquid/ Lyophilized),Hepatitis B immunoglobulin,"S,T",As Licensed
+19.3 Vaccines,BCG vaccine,"P,S,T",As licensed
+19.3 Vaccines,DPT+ Hib+ Hep B vaccine,"P,S,T",As licensed
+19.3 Vaccines,DPT vaccine,"P,S,T",As licensed
+19.3 Vaccines,Hepatitis B vaccine,"P,S,T",As licensed
+19.3 Vaccines,Japanese encephalitis vaccine,"P,S,T",As licensed
+19.3 Vaccines,Measles vaccine,"P,S,T",As licensed
+19.3 Vaccines,Measles vaccine,"P,S,T",Oral poliomyelitis vaccine
+19.3 Vaccines,Rotavirus vaccine,"P,S,T",As licensed
+19.3 Vaccines,Tetanus toxoid,"P,S,T",As licensed
+19.4 For Specific Group of Individuals,Rabies vaccine,"P,S,T",As licensed
+19.4 For Specific Group of Individuals,Alprostadil,"S,T",Injection 0.5 mg/mL
+19.4 For Specific Group of Individuals,Alprostadil,"S,T",Oral liquid 20 mg/mL
+19.4 For Specific Group of Individuals,Alprostadil,"S,T",Injection 20 mg/mL
+21.1 Anti-infective Medicines,Natamycin,"P,S,T",Drops 5 %
+21.4 Miotics and Antiglaucoma Medicines,Acetazolamide,"P,S,T",Tablet 250 mg
+21.4 Miotics and Antiglaucoma Medicines,Latanoprost,"P,S,T",Drops 0.005 %
+21.4 Miotics and Antiglaucoma Medicines,Pilocarpine,"P,S,T",Drops 2 %
+21.4 Miotics and Antiglaucoma Medicines,Timolol,"P,S,T",Drops 0.25 %
+21.5 Mydriatics,Homatropine,"P,S,T",Drops 2%
+21.5 Mydriatics,Phenylephrine,"P,S,T",Drops 5 %
+21.5 Mydriatics,Phenylephrine,"P,S,T",Injection 2%
+21.5 Mydriatics,Phenylephrine,"P,S,T",Tablet 0.5 mg
+21.5 Mydriatics,Phenylephrine,"P,S,T",Tablet 0.125 mg
+21.5 Mydriatics,Phenylephrine,"P,S,T",Injection 0.2 mg/mL
+22.1 Oxytocics and Abortifacient,Mifepristone,"P,S,T",Tablet 200 mg
+22.1 Oxytocics and Abortifacient,Mifepristone,"P,S,T",Tablet 100 mcg
+22.1 Oxytocics and Abortifacient,Mifepristone,"P,S,T",Tablet 200 mcg
+22.1 Oxytocics and Abortifacient,Mifepristone,"P,S,T",Injection 5 IU/mL
+22.1 Oxytocics and Abortifacient,Mifepristone,"P,S,T",Injection 10 IU/mL
+22.2 Medicines used in Preterm Labour,Betamethasone,"P,S,T",Injection 4 mg/mL
+22.2 Medicines used in Preterm Labour,Nifedipine,"S,T",Tablet 10 mg
+22.2 Medicines used in Preterm Labour,Nifedipine,"S,T",Tablet 25 mg
+22.2 Medicines used in Preterm Labour,Nifedipine,"S,T",Tablet 50 mg
+22.2 Medicines used in Preterm Labour,Nifedipine,"S,T",Tablet 100 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Injection 25 mg/mL
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 2 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 5 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 10 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 20 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Oral liquid 2 mg/5 mL
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Injection 5 mg/mL
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 1 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 2 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 4 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Oral liquid 1 mg/mL
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Injection (Long acting) 25 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Injection (Long acting) 37.5 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 10 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 25 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 50 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 75 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 10 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 20 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Capsule 10 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Capsule 40 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Capsule 60 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 200 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 300 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 500 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 300 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 500 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 100 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 200 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 400 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 200 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 400 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Oral liquid 100 mg/5 mL (p)
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 0.25 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 0.5 mg
+23.1 Medicines used in Psychotic Disorders,Fluphenazine,"P,S,T",Tablet 1 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Tablet 5 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Tablet 10 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Capsule 10 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Capsule 25 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Capsule 75 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Capsule 10 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Capsule 20 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Capsule 40 mg
+23.3 Medicines used in Generalized Anxiety and Sleep Disorders,Zolpidem,"P,S,T",Capsule 60 mg
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Tablet (Sub-lingual) 0.4 mg
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Tablet (Sub-lingual) 0.4 mg (A)
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Tablet (Sub-lingual) 2 mg (A) +
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Oral Dosage forms 4 mg
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Tablet 4 mg
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Tablet 5 mg
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Tablet 10 mg
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Tablet 2 mg
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Tablet 4 mg
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Oral liquid 2 mg/5 mL
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Injection 5 %
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Injection 10 %
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Injection 25 %
+23.4 Medicines used in Obsessive Compulsive Disorders and Panic attacks,Buprenorphine,"P,S,T",Injection 50 %
+24.1 Antiasthmatic Medicines,Potassium chloride,"P,S,T",Oral liquid 500 mg/5 mL
+24.1 Antiasthmatic Medicines,Ringer lactate,"P,S,T",Injection (as per IP)
+24.1 Antiasthmatic Medicines,Sodium bicarbonate,"P,S,T",Injection (as per IP)
+24.1 Antiasthmatic Medicines,Sodium chloride,"P,S,T",Injection 0.9%
+25.2 Miscellaneous,Water for Injection,"P,S,T",Injection
+25.2 Miscellaneous,Ascorbic acid (Vitamin C),"P,S,T",Tablet 100 mg
+25.2 Miscellaneous,Ascorbic acid (Vitamin C),"P,S,T",Tablet 500 mg
+25.2 Miscellaneous,Ascorbic acid (Vitamin C),"P,S,T",Tablet 625 mg (equivalent to  elemental
+25.2 Miscellaneous,Ascorbic acid (Vitamin C),"P,S,T",Tablet 1250 mg (equivalent to  elemental
+25.2 Miscellaneous,Ascorbic acid (Vitamin C),"P,S,T",Tablet 10 mg
+25.2 Miscellaneous,Ascorbic acid (Vitamin C),"P,S,T",Tablet 50 mg
+25.2 Miscellaneous,Ascorbic acid (Vitamin C),"P,S,T",Tablet 100 mg
+25.2 Miscellaneous,Riboflavin,"P,S,T",Tablet 10 mg
+25.2 Miscellaneous,Riboflavin,"P,S,T",Tablet 100 mg
+25.2 Miscellaneous,Riboflavin,"P,S,T",Injection 100 mg/mL
+25.2 Miscellaneous,Riboflavin,"P,S,T",Capsule/Tablet 50000 IU (including
+25.2 Miscellaneous,Riboflavin,"P,S,T",Oral liquid 100000 IU/mL Injection 50000
+25.2 Miscellaneous,Vitamin A,"P,S,T",IU/mL
+25.2 Miscellaneous,Vitamin A,"P,S,T",Tablet 0.5 mg
+25.2 Miscellaneous,Vitamin A,"P,S,T",Tablet 2 mg
+25.2 Miscellaneous,Vitamin A,"P,S,T",Tablet 4 mg
+25.2 Miscellaneous,Vitamin A,"P,S,T",Oral liquid 0.5 mg/5 mL (p)
+25.2 Miscellaneous,Vitamin A,"P,S,T",Injection 4 mg/mL
+25.2 Miscellaneous,Vitamin A,"P,S,T",Injection 60 mg/ 0.6 mL
+25.2 Miscellaneous,Vitamin A,"P,S,T",Tablet 500 mg
+25.2 Miscellaneous,Vitamin A,"P,S,T",Tablet 650 mg
+25.2 Miscellaneous,Vitamin A,"P,S,T",Oral liquid 120 mg/5 mL (p)
+25.2 Miscellaneous,Vitamin A,"P,S,T",Oral Liquid 125 mg/5 mL (p)
+25.2 Miscellaneous,Vitamin A,"P,S,T",Oral Liquid 250 mg/5 mL (p)

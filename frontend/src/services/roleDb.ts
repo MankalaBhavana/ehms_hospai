@@ -29,6 +29,12 @@ export interface AppUser {
 
   department?: string
 
+  /** Contact and profile details returned by the server (read-only in the staff list). */
+  email?: string
+  phone?: string
+  jobRole?: string
+  createdAt?: string
+
   /** Individual user-level module overrides */
   allowedModules?: string[]
 
@@ -189,25 +195,6 @@ export const ALL_SYSTEM_MODULES = [
   "patient360_search",
 
   "beds",
-  "accounts",
-  "accounts_dashboard",
-  "accounts_coa",
-  "accounts_gl",
-  "accounts_receipts",
-  "accounts_payments",
-  "accounts_ar",
-  "accounts_ap",
-  "accounts_cash_bank",
-  "accounts_pharmacy",
-  "accounts_insurance",
-  "accounts_tax",
-  "accounts_budget",
-  "accounts_assets",
-  "accounts_cost_centres",
-  "accounts_reports",
-  "accounts_period_close",
-  "accounts_audit",
-  "accounts_manager",
 ]
 
 /**
@@ -454,41 +441,6 @@ const INITIAL_ROLES: AppRole[] = [
       "hr_timetables",
       "hr_audit",
       "hr_reports",
-    ],
-    status: "Active",
-    isSystem: true,
-  },
-  {
-    id: "ROLE_ACCOUNTANT",
-    name: "Accountant",
-    allowedModules: ["accounts", "accounts_dashboard", "accounts_coa", "accounts_gl", "accounts_receipts", "accounts_payments", "accounts_ar", "accounts_ap", "accounts_cash_bank", "accounts_reports"],
-    status: "Active",
-    isSystem: true,
-  },
-  {
-    id: "ROLE_FINANCE_MANAGER",
-    name: "Finance Manager",
-    allowedModules: [
-      "accounts",
-      "accounts_dashboard",
-      "accounts_coa",
-      "accounts_gl",
-      "accounts_receipts",
-      "accounts_payments",
-      "accounts_ar",
-      "accounts_ap",
-      "accounts_cash_bank",
-      "accounts_pharmacy",
-      "accounts_insurance",
-      "accounts_tax",
-      "accounts_budget",
-      "accounts_assets",
-      "accounts_cost_centres",
-      "accounts_reports",
-      "accounts_period_close",
-      "accounts_audit",
-      "accounts_manager",
-      "billing",
     ],
     status: "Active",
     isSystem: true,

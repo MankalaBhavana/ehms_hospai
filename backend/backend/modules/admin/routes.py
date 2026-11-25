@@ -423,12 +423,15 @@ def admin_user_update_record(user_id):
 @admin_bp.delete("/api/admin/users/<user_id>")
 @admin_access_required
 def admin_user_delete_record(user_id):
-    ok = db_delete_admin_user(user_id, current_hospital_id())
+    try:
+        ok = db_delete_admin_user(user_id, current_hospital_id())
+    except PermissionError as error:
+        return jsonify({"success": False, "error": str(error)}), 403
     if not ok:
         return jsonify({"success": False, "error": "User not found"}), 404
     delete_all_user_sessions(user_id)
-    log_audit_event("deactivate", "users", str(user_id), {})
-    return jsonify({"success": True, "message": "User deactivated successfully"})
+    log_audit_event("delete", "users", str(user_id), {})
+    return jsonify({"success": True, "message": "User removed"})
 
 
 @admin_bp.post("/api/admin/users/<user_id>/reset-password")

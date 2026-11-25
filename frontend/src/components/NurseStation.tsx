@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import DictationTextarea from "./voice/DictationTextarea"
-import { db, DBOPEncounter } from "../services/db"
+import { isHeldForPayment, db, DBOPEncounter } from "../services/db"
 import { useStickyState } from "../hooks/useStickyState"
 import { Icon } from "./icons"
 import {
@@ -299,6 +299,7 @@ export default function NurseStation({
           ) {
             return false
           }
+          if (isHeldForPayment(e)) return false // consultation fee not paid yet
           if (e.timestamps?.calledToNurse) {
             return !e.timestamps?.vitalsRecorded
           }

@@ -393,14 +393,14 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
 
 // --- Hero landing page circular diagram ---
 const DATA_NODES = [
-  { label: "Medical History",  angle: -135, bg: "#FFE4EF", iconBg: "#F472B6", svg: "M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z" },
-  { label: "Clinical Records", angle: -90,  bg: "#E0F2FE", iconBg: "#38BDF8", svg: "M4.5 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM14.25 8.625a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0ZM1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM17.25 19.128l-.001.144a2.25 2.25 0 0 1-.233.96 10.088 10.088 0 0 0 5.06-1.01.75.75 0 0 0 .42-.643 4.875 4.875 0 0 0-6.957-4.611 8.586 8.586 0 0 1 1.71 5.157v.003Z" },
-  { label: "Lab & Imaging",    angle: -45,  bg: "#FEF3C7", iconBg: "#F59E0B", svg: "M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" },
-  { label: "Medications",      angle: 0,    bg: "#F3E8FF", iconBg: "#A855F7", svg: "M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" },
-  { label: "Appointments",     angle: 45,   bg: "#DCFCE7", iconBg: "#22C55E", svg: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" },
-  { label: "Care Journey",     angle: 90,   bg: "#E0F2FE", iconBg: "#0EA5E9", svg: "M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" },
-  { label: "Communications",   angle: 135,  bg: "#E0F2FE", iconBg: "#3B82F6", svg: "M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V20.25a.75.75 0 0 0 1.28.53l3.58-3.58A48.52 48.52 0 0 0 11.25 17c2.115 0 4.198-.137 6.24-.402 1.129-.146 2.112-.717 2.76-1.635Z" },
-  { label: "Documents",        angle: 180,  bg: "#FEF9C3", iconBg: "#EAB308", svg: "M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" },
+  { label: "Medical History",  angle: 315, bg: "#FFE4EF", iconBg: "#F472B6", svg: "M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z" },
+  { label: "Clinical Records", angle: 0,  bg: "#E0F2FE", iconBg: "#38BDF8", svg: "M4.5 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM14.25 8.625a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0ZM1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM17.25 19.128l-.001.144a2.25 2.25 0 0 1-.233.96 10.088 10.088 0 0 0 5.06-1.01.75.75 0 0 0 .42-.643 4.875 4.875 0 0 0-6.957-4.611 8.586 8.586 0 0 1 1.71 5.157v.003Z" },
+  { label: "Lab & Imaging",    angle: 45,  bg: "#FEF3C7", iconBg: "#F59E0B", svg: "M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" },
+  { label: "Medications",      angle: 90,    bg: "#F3E8FF", iconBg: "#A855F7", svg: "M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" },
+  { label: "Appointments",     angle: 135,   bg: "#DCFCE7", iconBg: "#22C55E", svg: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" },
+  { label: "Care Journey",     angle: 180,   bg: "#E0F2FE", iconBg: "#0EA5E9", svg: "M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" },
+  { label: "Communications",   angle: 225,  bg: "#E0F2FE", iconBg: "#3B82F6", svg: "M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V20.25a.75.75 0 0 0 1.28.53l3.58-3.58A48.52 48.52 0 0 0 11.25 17c2.115 0 4.198-.137 6.24-.402 1.129-.146 2.112-.717 2.76-1.635Z" },
+  { label: "Documents",        angle: 270,  bg: "#FEF9C3", iconBg: "#EAB308", svg: "M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" },
 ]
 
 /** Hosp AI → Patient 360°: hero landing page + search. */
@@ -458,7 +458,7 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
   // ── Hero landing page (no patient selected) ──
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="relative min-h-screen bg-gradient-to-br from-[#E8F0FE] via-[#EEF4FF] to-white overflow-hidden">
+      <div className="relative min-h-screen bg-gradient-to-br from-[#E6F0FD] via-[#F1F6FE] to-[#EAF2FD] overflow-hidden">
 
         {/* Decorative "+" marks */}
         {[
@@ -481,26 +481,26 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
 
           {/* LEFT: title, tagline, pills, search */}
           <div className="flex-1 flex flex-col justify-center px-8 py-10 lg:px-14 lg:py-16 max-w-2xl">
-            <h1 className="text-4xl lg:text-5xl font-bold text-[#1E3A6E] leading-tight tracking-tight">
-              Patient <span className="text-[#1B4FD8]">360°</span>
+            <h1 className="text-5xl lg:text-6xl font-extrabold text-[#12285A] leading-tight tracking-tight">
+              Patient <span className="text-[#0E9FBF]">360°</span>
             </h1>
-            <p className="mt-3 text-xl font-semibold text-[#1B4FD8]">
+            <p className="mt-3 text-xl font-bold text-[#12285A]">
               One patient. Complete view. Better care.
             </p>
             <p className="mt-3 text-[#475569] text-[13.5px] leading-relaxed max-w-md">
               Get a unified view of your patient's journey — from registration to follow-up — with clinical data, care coordination and PatientReach AI.
             </p>
 
-            {/* Feature pills */}
-            <div className="mt-7 flex flex-wrap gap-3">
+            {/* Feature cards */}
+            <div className="mt-7 grid grid-cols-4 gap-3 max-w-xl">
               {[
-                { icon: "🧑‍⚕️", label: "Unified Patient Profile" },
-                { icon: "📈",    label: "Clinical Timeline" },
-                { icon: "🤝",    label: "Care Coordination" },
-                { icon: "💬",    label: "PatientReach AI" },
+                { icon: "M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.118a7.5 7.5 0 0 1 15 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.5-1.632Z", label: "Unified\nPatient Profile" },
+                { icon: "M3 12h4.5l2.25-6 4.5 12 2.25-6H21", label: "Clinical\nTimeline" },
+                { icon: "M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z", label: "Care\nCoordination" },
+                { icon: "M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V20.25a.75.75 0 0 0 1.28.53l3.58-3.58A48.52 48.52 0 0 0 11.25 17c2.115 0 4.198-.137 6.24-.402 1.129-.146 2.112-.717 2.76-1.635Z", label: "PatientReach\nAI" },
               ].map((f) => (
-                <div key={f.label} className="flex items-center gap-2 rounded-xl bg-white border border-[#DCE6FB] px-3.5 py-2.5 text-[12px] font-medium text-[#1E3A6E] shadow-sm">
-                  <span className="text-base" aria-hidden>{f.icon}</span>
+                <div key={f.label} className="flex flex-col items-center gap-2 rounded-xl bg-[#E4EEFC] px-2 py-4 text-center text-[11px] font-medium leading-tight text-[#1E3A6E] whitespace-pre-line">
+                  <svg viewBox="0 0 24 24" className="h-7 w-7 text-[#2563EB]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={f.icon} /></svg>
                   {f.label}
                 </div>
               ))}
@@ -508,7 +508,7 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
 
             {/* Search bar */}
             <form onSubmit={search} role="search"
-              className="mt-8 flex items-center gap-2 rounded-xl border border-[#CBD5E1] bg-white p-1.5 shadow-md max-w-lg">
+              className="mt-8 flex items-center gap-2 rounded-xl border border-[#CBD5E1] bg-white p-1.5 shadow-md max-w-xl">
               <span aria-hidden className="flex items-center pl-2 text-[#94A3B8] text-lg">🔍</span>
               <input
                 autoFocus
@@ -556,100 +556,43 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
             )}
           </div>
 
-          {/* RIGHT: Circular data-source diagram — matches reference image exactly */}
-          <div className="flex-1 flex items-center justify-center p-8 relative">
-            <div style={{ position: "relative", width: 340, height: 340 }}>
-
-              {/* Outer dashed orbit ring */}
-              <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}>
-                {/* Main orbit circle */}
-                <circle cx="170" cy="170" r="148" fill="none" stroke="#BFDBFE" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.7" />
-                {/* Inner glow ring */}
-                <circle cx="170" cy="170" r="110" fill="none" stroke="#DBEAFE" strokeWidth="1" opacity="0.5" />
-
-                {/* Dashed lines from center to each node + dot at orbit */}
+          {/* RIGHT: Circular data-source diagram */}
+          <div className="flex-1 flex items-center justify-center p-6 relative">
+            <div style={{ position: "relative", width: 480, height: 480, maxWidth: "100%" }}>
+              <svg viewBox="0 0 480 480" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+                <circle cx="240" cy="240" r="190" fill="none" stroke="#BFD6F6" strokeWidth="1.5" strokeDasharray="3 5" />
+                <circle cx="240" cy="240" r="105" fill="rgba(255,255,255,0.55)" stroke="#D3E3FA" strokeWidth="1.5" />
                 {DATA_NODES.map((node) => {
                   const rad = (node.angle * Math.PI) / 180
-                  const r = 148, cx = 170 + r * Math.sin(rad), cy = 170 - r * Math.cos(rad)
-                  const dx = cx - 170, dy = cy - 170, dist = Math.sqrt(dx * dx + dy * dy)
-                  const cr = 44 // center circle radius
-                  const sx = 170 + (cr / dist) * dx, sy = 170 + (cr / dist) * dy
-                  const ex = cx - (26 / dist) * dx, ey = cy - (26 / dist) * dy
-                  return (
-                    <g key={node.label}>
-                      <line x1={sx} y1={sy} x2={ex} y2={ey}
-                        stroke="#93C5FD" strokeWidth="1.2" strokeDasharray="3 3" opacity="0.65" />
-                      {/* Small dot on orbit ring at connection point */}
-                      <circle cx={cx} cy={cy} r="3.5" fill="#60A5FA" opacity="0.5" />
-                    </g>
-                  )
+                  const mx = 240 + 190 * Math.sin(rad + 0.4), my = 240 - 190 * Math.cos(rad + 0.4)
+                  return <circle key={node.label} cx={mx} cy={my} r="3" fill="#93C5FD" />
                 })}
               </svg>
 
-              {/* Center — person avatar */}
-              <div style={{
-                position: "absolute", top: "50%", left: "50%",
-                transform: "translate(-50%,-50%)",
-                width: 90, height: 90, borderRadius: "50%",
-                background: "linear-gradient(145deg, #60A5FA 0%, #3B82F6 50%, #2563EB 100%)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: "0 0 0 8px rgba(96,165,250,0.18), 0 4px 24px rgba(37,99,235,0.30)",
-                zIndex: 10,
-              }}>
-                {/* Person SVG avatar */}
-                <svg viewBox="0 0 64 80" style={{ width: 56, height: 60 }} fill="none">
-                  {/* Head */}
-                  <ellipse cx="32" cy="20" rx="13" ry="14" fill="white" opacity="0.95" />
-                  {/* Neck */}
-                  <rect x="27" y="32" width="10" height="7" rx="4" fill="white" opacity="0.85" />
-                  {/* Scrubs / body */}
-                  <path d="M14 72 Q14 50 32 48 Q50 50 50 72Z" fill="white" opacity="0.9" />
-                  {/* Collar V */}
-                  <path d="M27 48 L32 56 L37 48" stroke="#BFDBFE" strokeWidth="1.5" fill="none" />
-                </svg>
+              {/* Center - patient avatar with double ring */}
+              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 190, height: 190, borderRadius: "50%", background: "rgba(255,255,255,0.7)", border: "2px solid #DCE9FB", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 30px rgba(37,99,235,0.15)", zIndex: 10 }}>
+                <div style={{ width: 150, height: 150, borderRadius: "50%", overflow: "hidden", background: "linear-gradient(180deg,#EAF3FF,#CFE3FB)", border: "4px solid #fff", boxShadow: "0 0 0 2px #93C5FD" }}>
+                  <svg viewBox="0 0 150 150" style={{ width: "100%", height: "100%" }}>
+                    <path d="M18 150 C18 112 46 100 75 100 C104 100 132 112 132 150Z" fill="#4FB3C8" />
+                    <path d="M58 100 L75 124 L92 100Z" fill="#fff" />
+                    <rect x="64" y="82" width="22" height="22" rx="8" fill="#F2C9A5" />
+                    <ellipse cx="75" cy="62" rx="25" ry="28" fill="#F7D6B8" />
+                    <path d="M49 58 C48 30 70 26 82 30 C98 33 104 46 101 60 C96 48 86 44 74 46 C62 48 54 50 49 58Z" fill="#2B2F3A" />
+                    <circle cx="66" cy="64" r="2.4" fill="#2B2F3A" /><circle cx="84" cy="64" r="2.4" fill="#2B2F3A" />
+                    <path d="M67 77 Q75 83 83 77" stroke="#B5705A" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  </svg>
+                </div>
               </div>
 
-              {/* Node cards — circular, styled like reference image */}
+              {/* Node circles: icon + label inside */}
               {DATA_NODES.map((node) => {
                 const rad = (node.angle * Math.PI) / 180
-                const r = 148
-                const cx = 170 + r * Math.sin(rad)
-                const cy = 170 - r * Math.cos(rad)
+                const left = `${((240 + 190 * Math.sin(rad)) / 480) * 100}%`
+                const top = `${((240 - 190 * Math.cos(rad)) / 480) * 100}%`
                 return (
-                  <div key={node.label} style={{
-                    position: "absolute",
-                    left: cx, top: cy,
-                    transform: "translate(-50%,-50%)",
-                    zIndex: 5,
-                    display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
-                  }}>
-                    {/* Circular card */}
-                    <div style={{
-                      width: 52, height: 52,
-                      borderRadius: "50%",
-                      background: node.bg,
-                      border: "2px solid white",
-                      boxShadow: "0 2px 12px rgba(27,79,216,0.13)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}>
-                      <div style={{
-                        width: 30, height: 30, borderRadius: "50%",
-                        background: node.iconBg,
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                      }}>
-                        <svg viewBox="0 0 24 24" style={{ width: 16, height: 16 }} fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <path d={node.svg} />
-                        </svg>
-                      </div>
-                    </div>
-                    {/* Label */}
-                    <span style={{
-                      fontSize: 10, fontWeight: 600, color: "#1E3A6E",
-                      textAlign: "center", lineHeight: 1.3,
-                      whiteSpace: "nowrap",
-                      background: "rgba(255,255,255,0.85)",
-                      borderRadius: 4, padding: "1px 4px",
-                    }}>{node.label}</span>
+                  <div key={node.label} style={{ position: "absolute", left, top, transform: "translate(-50%,-50%)", zIndex: 5, width: 88, height: 88, borderRadius: "50%", background: "#fff", border: "2px solid #E3EDFB", boxShadow: "0 6px 18px rgba(27,79,216,0.14)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3 }}>
+                    <svg viewBox="0 0 24 24" style={{ width: 28, height: 28 }} fill="none" stroke={node.iconBg} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d={node.svg} /></svg>
+                    <span style={{ fontSize: 10.5, fontWeight: 600, color: "#1E3A6E", textAlign: "center", lineHeight: 1.15, maxWidth: 68 }}>{node.label}</span>
                   </div>
                 )
               })}
@@ -665,7 +608,7 @@ export default function PatientSearch360({ navigate }: { navigate: (module: stri
           </span>
           <span className="flex items-center gap-1.5 font-semibold text-[#1B4FD8]">
             <span className="rounded bg-[#1B4FD8] text-white px-1.5 py-0.5 text-[10px] font-bold leading-none">H</span>
-            Powered by HospAi
+            Powered by HospAI
           </span>
         </div>
       </div>

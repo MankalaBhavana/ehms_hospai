@@ -148,7 +148,7 @@ def list_registry(hospital_id, q="", state="", limit=25, offset=0):
 # ── Profile ─────────────────────────────────────────────────────────────────────────────────────
 _PROFILE_FIELDS = (
     "patient_id, name, middle_name, last_name, dob, age, gender, phone, address, blood_group, "
-    "emergency_contact, allergies, patient_type, created_at, updated_at"
+    "emergency_contact, allergies, symptoms, patient_type, created_at, updated_at"
 )  # no Aadhaar / identity hash: those never leave the patient module
 
 
@@ -202,10 +202,35 @@ def get_profile(hospital_id, patient_id):
                      (hospital_id, pid))
         responses = _all(cur, "SELECT id, survey_key, survey_version, review_status, submitted_at, channel FROM survey_responses "
                               "WHERE hospital_id = ? AND patient_id = ? ORDER BY submitted_at DESC LIMIT 10", (hospital_id, pid))
-        messages = _all(cur, "SELECT id, channel, kind, status, created_at FROM patient_messages WHERE hospital_id = ? AND patient_id = ? "
+        messages = _all(cur, "SELECT id, channel, kind, body, status, created_at FROM patient_messages WHERE hospital_id = ? AND patient_id = ? "
                              "ORDER BY created_at DESC LIMIT 15", (hospital_id, pid))
         prefs = _one(cur, "SELECT preferred_language, preferred_channel, contact_from_hour, contact_to_hour, updated_by, updated_at "
                           "FROM patient360_preferences WHERE hospital_id = ? AND patient_id = ?", (hospital_id, pid))
+        phone_digits = "".join(ch for ch in (patient.get("phone") or "") if ch.isdigit())
+        whatsapp_fb = None
+        if phone_digits:
+            whatsapp_fb = _one(
+                cur,
+                """
+                SELECT comment, received_at, whatsapp_message_id, rating
+                FROM patient_feedback
+                WHERE RIGHT(regexp_replace(phone_number, '[^0-9]', '', 'g'), 10) = ?
+                  AND comment IS NOT NULL AND comment <> ''
+                ORDER BY received_at DESC LIMIT 1
+                """,
+                (phone_digits[-10:],),
+            )
+        whatsapp_msg = _one(
+            cur,
+            """
+            SELECT body, created_at, kind
+            FROM patient_messages
+            WHERE hospital_id = ? AND patient_id = ? AND channel = 'whatsapp'
+              AND body IS NOT NULL AND body <> ''
+            ORDER BY created_at DESC LIMIT 1
+            """,
+            (hospital_id, pid),
+        )
     medications = []
     for rx in rx_rows:
         items = _j(rx.pop("medicines_json", None), [])
@@ -237,6 +262,34 @@ def get_profile(hospital_id, patient_id):
         r.update(_source("outpatient" if r.get("encounter_type") == "OP" else "inpatient", "encounter", r.get("id")))
     for r in appointments:
         r.update(_source("appointments", "appointment", r.get("id")))
+
+    whatsapp_symptom_text = (
+        (whatsapp_fb.get("comment") if whatsapp_fb else None)
+        or (whatsapp_msg.get("body") if whatsapp_msg else None)
+        or patient.get("symptoms")
+        or (encounters[0].get("symptoms") if encounters and encounters[0].get("symptoms") else None)
+    )
+    whatsapp_symptom_at = (
+        (whatsapp_fb.get("received_at") if whatsapp_fb else None)
+        or (whatsapp_msg.get("created_at") if whatsapp_msg else None)
+        or patient.get("updated_at")
+    )
+    whatsapp_symptoms = {
+        "symptoms": whatsapp_symptom_text,
+        "received_at": whatsapp_symptom_at,
+        "channel": "whatsapp" if (whatsapp_fb or whatsapp_msg) else "intake",
+        "has_whatsapp_source": bool(whatsapp_fb or whatsapp_msg),
+    } if whatsapp_symptom_text else None
+
+    now_dt = current_utc_naive()
+    further_appointments = []
+    for a in appointments:
+        st = str(a.get("status") or "").lower()
+        dt = a.get("appointment_date")
+        if st in ("scheduled", "checked_in", "confirmed", "booked", "pending") or (dt and dt >= now_dt):
+            further_appointments.append(a)
+    further_appointments.sort(key=lambda x: str(x.get("appointment_date") or ""), reverse=False)
+
     return {
         "patient": patient,
         "clinical_history": history,
@@ -254,6 +307,8 @@ def get_profile(hospital_id, patient_id):
         "admissions": admissions,
         "encounters": encounters,
         "appointments": appointments,
+        "further_appointments": further_appointments,
+        "whatsapp_symptoms": whatsapp_symptoms,
         "journeys": journeys,
         "checkpoints": checkpoints,
         "tasks": tasks,

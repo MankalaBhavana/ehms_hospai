@@ -3,7 +3,7 @@ import { patientPageUrl } from "../patientRecord/patientRecord"
 import { p360, type Row } from "./api"
 import { ClinicalTab, CommsTab, ConsentTab, EncountersTab, JourneyTab, MedicationsTab, NewTask, SurveysTab, TimelineTab } from "./PatientWorkspace"
 import TasksView from "./TasksView"
-import { Badge, btnCls, Card, cx, Empty, ErrorBox, errMsg, fmtDate, fmtDateTime, fullName, inputCls, Loading, pretty, Table, useAsync } from "./ui"
+import { Badge, btnCls, Card, cx, Empty, ErrorBox, errMsg, fmtDate, fmtDateTime, fullName, inputCls, Loading, pretty, Table, useAsync, firstSymptoms } from "./ui"
 
 type Tab = "overview" | "timeline" | "clinical" | "vitals" | "care_team" | "billing" | "encounters" | "medications" | "labs" | "appointments" | "journey" | "surveys" | "communications" | "tasks" | "documents" | "consent"
 
@@ -66,7 +66,7 @@ function Overview({ d, go }: { d: Row; go: (t: Tab) => void }) {
   const p = d.patient
   const latestVisit = d.encounters[0] || d.admissions[0]
   const nextAppt = (d.further_appointments && d.further_appointments[0]) || d.appointments.filter((a: Row) => ["scheduled", "checked_in", "confirmed", "booked", "pending"].includes(a.status))[0] || d.appointments[0]
-  const whatsappSymptomText = d.whatsapp_symptoms?.symptoms || d.patient?.symptoms || latestVisit?.symptoms || latestVisit?.chief_complaint
+  const whatsappSymptomText = firstSymptoms(d.whatsapp_symptoms?.symptoms, d.patient?.symptoms, latestVisit?.symptoms, latestVisit?.chief_complaint)
   const whatsappSymptomDate = d.whatsapp_symptoms?.received_at || d.patient?.updated_at
   const isAwaitingTriage = latestVisit && (
     latestVisit.status === "Awaiting Triage" ||
@@ -150,7 +150,7 @@ function Overview({ d, go }: { d: Row; go: (t: Tab) => void }) {
                 <div className="rounded border border-emerald-200 bg-emerald-50/70 p-2 text-[11.5px]">
                   <div className="flex items-center justify-between font-semibold text-emerald-900">
                     <span className="flex items-center gap-1">🩺 Symptoms</span>
-                    {whatsappSymptomDate && <span className="text-[10px] text-emerald-700 font-normal">{fmtDate(whatsappSymptomDate)}</span>}
+                    {whatsappSymptomText && whatsappSymptomDate && <span className="text-[10px] text-emerald-700 font-normal">{fmtDate(whatsappSymptomDate)}</span>}
                   </div>
                   <div className="mt-0.5 text-gray-900 font-medium italic">
                     {whatsappSymptomText ? `"${whatsappSymptomText}"` : "None reported"}
@@ -409,6 +409,12 @@ function Documents({ d }: { d: Row }) {
 function Profile({ patientId, onClose, navigate }: { patientId: string; onClose: () => void; navigate: (m: string) => void }) {
   const [tab, setTab] = useState<Tab>("overview")
   const [showTask, setShowTask] = useState(false)
+  const [copied, setCopied] = useState("")
+  /** Those modules take no patient input, so hand the ID over via the clipboard to paste into their search. */
+  const openFor = async (module: string) => {
+    try { await navigator.clipboard.writeText(patientId); setCopied(patientId) } catch { /* clipboard blocked: still navigate */ }
+    navigate(module)
+  }
   const { data: raw, error, loading, reload } = useAsync(() => p360.profile(patientId), [patientId])
   // Older backends omit some sections; treat a missing list as empty instead of crashing the page.
   const d = raw ? { ...Object.fromEntries(LISTS.map((k) => [k, []])), ...raw } : null
@@ -429,7 +435,7 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
     latestVisit.department === "Awaiting Triage" ||
     (latestVisit.status || "").toLowerCase().includes("triage")
   )
-  const whatsappSymptomText = d.whatsapp_symptoms?.symptoms || d.patient?.symptoms || latestVisit?.symptoms || latestVisit?.chief_complaint
+  const whatsappSymptomText = firstSymptoms(d.whatsapp_symptoms?.symptoms, d.patient?.symptoms, latestVisit?.symptoms, latestVisit?.chief_complaint)
   const whatsappSymptomDate = d.whatsapp_symptoms?.received_at || d.patient?.updated_at
   const openTasks = d.tasks.filter((t: Row) => !["resolved", "cancelled"].includes(t.status)).length
   const admitted = d.admissions.some((a: Row) => !a.discharge_date)
@@ -493,7 +499,7 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
                 <span className="font-medium text-gray-900 italic">
                   {whatsappSymptomText ? `"${whatsappSymptomText}"` : "None reported"}
                 </span>
-                {whatsappSymptomDate && <span className="text-[10.5px] text-[#64748B]">({fmtDate(whatsappSymptomDate)})</span>}
+                {whatsappSymptomText && whatsappSymptomDate && <span className="text-[10.5px] text-[#64748B]">({fmtDate(whatsappSymptomDate)})</span>}
               </div>
             </div>
           </div>
@@ -507,8 +513,9 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
         <AlertsStrip d={d} admitted={admitted} />
         <div className="mt-3 flex flex-wrap gap-2 border-t border-[#EEF1F6] pt-3">
           <span className="self-center text-[11px] font-semibold uppercase tracking-wide text-[#94A3B8]">Quick actions</span>
-          <button className={btnCls.ghost} onClick={() => navigate("patient_messages")}>💬 Send message</button>
-          <button className={btnCls.ghost} onClick={() => navigate("appointments")}>📅 Book appointment</button>
+          {copied && <span className="self-center text-[11px] text-emerald-700">Patient ID {copied} copied</span>}
+          <button className={btnCls.ghost} onClick={() => openFor("patient_messages")} title="Copies the patient ID, then opens Patient Messages">💬 Send message</button>
+          <button className={btnCls.ghost} onClick={() => openFor("appointments")} title="Copies the patient ID, then opens Appointments">📅 Book appointment</button>
           <button className={btnCls.ghost} onClick={() => setShowTask(true)}>✅ Create task</button>
           <button className={btnCls.ghost} onClick={() => setTab("consent")}>🔒 Consent</button>
         </div>

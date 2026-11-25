@@ -264,11 +264,16 @@ def get_profile(hospital_id, patient_id):
     for r in appointments:
         r.update(_source("appointments", "appointment", r.get("id")))
 
+    # Never show the hospital's own registration message (or its helpline / link boilerplate) as the patient's symptoms.
+    clean = rules.clean_symptom_text
+    patient["symptoms"] = clean(patient.get("symptoms"))
+    for e in encounters:
+        e["symptoms"] = clean(e.get("symptoms"))
     whatsapp_symptom_text = (
-        (whatsapp_msg.get("body") if whatsapp_msg else None)
+        clean(whatsapp_msg.get("body") if whatsapp_msg else None)
         or patient.get("symptoms")
-        or (encounters[0].get("symptoms") if encounters and encounters[0].get("symptoms") else None)
-        or (whatsapp_fb.get("comment") if whatsapp_fb else None)
+        or (encounters[0].get("symptoms") if encounters else None)
+        or clean(whatsapp_fb.get("comment") if whatsapp_fb else None)
     )
     whatsapp_symptom_at = (
         (whatsapp_msg.get("created_at") if whatsapp_msg else None)

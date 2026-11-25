@@ -2,7 +2,7 @@ import { useState } from "react"
 import { patientPageUrl } from "../patientRecord/patientRecord"
 import { p360, type Row } from "./api"
 import TasksView from "./TasksView"
-import { Badge, btnCls, Card, Empty, ErrorBox, errMsg, Field, fmtDate, fmtDateTime, fullName, inputCls, Loading, pretty, Table, Tabs, useAsync } from "./ui"
+import { Badge, btnCls, Card, Empty, ErrorBox, errMsg, Field, fmtDate, fmtDateTime, fullName, inputCls, Loading, pretty, Table, Tabs, useAsync, firstSymptoms } from "./ui"
 
 type Tab = "overview" | "timeline" | "clinical" | "encounters" | "medications" | "investigations" | "journey" | "surveys" | "communications" | "tasks" | "consent"
 
@@ -104,7 +104,7 @@ export default function PatientWorkspace({ patientId, onBack, navigate }: { pati
 function OverviewTab({ d }: { d: Row }) {
   const upcoming = d.appointments.filter((a: Row) => ["scheduled", "checked_in"].includes(a.status)).slice(0, 4)
   const nextAppt = (d.further_appointments && d.further_appointments[0]) || upcoming[0] || d.appointments[0]
-  const whatsappSymptomText = d.whatsapp_symptoms?.symptoms || d.patient?.symptoms || d.encounters?.[0]?.symptoms || d.encounters?.[0]?.chief_complaint
+  const whatsappSymptomText = firstSymptoms(d.whatsapp_symptoms?.symptoms, d.patient?.symptoms, d.encounters?.[0]?.symptoms, d.encounters?.[0]?.chief_complaint)
   const nextCp = d.checkpoints.find((c: Row) => ["scheduled", "queued", "overdue"].includes(c.status))
   return (
     <div className="grid gap-3 md:grid-cols-2">
@@ -207,7 +207,7 @@ export function ClinicalTab({ d }: { d: Row }) {
 
 export function EncountersTab({ d }: { d: Row }) {
   const nextAppt = (d.further_appointments && d.further_appointments[0]) || d.appointments?.filter((a: Row) => ["scheduled", "checked_in", "confirmed", "booked", "pending"].includes(a.status))[0] || d.appointments?.[0]
-  const whatsappSymptomText = d.whatsapp_symptoms?.symptoms || d.patient?.symptoms || d.encounters?.[0]?.symptoms || d.encounters?.[0]?.chief_complaint
+  const whatsappSymptomText = firstSymptoms(d.whatsapp_symptoms?.symptoms, d.patient?.symptoms, d.encounters?.[0]?.symptoms, d.encounters?.[0]?.chief_complaint)
 
   return (
     <div className="space-y-3">

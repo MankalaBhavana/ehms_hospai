@@ -166,6 +166,10 @@ def handle_incoming_message(phone, text, reply=None):
             logging.getLogger(__name__).exception("Failed to record WhatsApp opt-out")
         return
     rating, comment = parse_rating_and_comment(text)
+    # An echoed copy of the hospital's own registration message is not a symptom report.
+    from modules.patient360.rules import clean_symptom_text
+    if comment and clean_symptom_text(comment) is None:
+        comment = ""
 
     # Matched on the last 10 digits: the feedback window is opened with
     # whatever the patient record holds ("9876543210"), while the reply comes

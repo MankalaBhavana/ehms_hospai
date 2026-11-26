@@ -1,11 +1,12 @@
-import { useState } from "react"
+import { Fragment, useState } from "react"
+import { renderToStaticMarkup } from "react-dom/server"
 import { patientPageUrl } from "../patientRecord/patientRecord"
 import { p360, type Row } from "./api"
 import { ClinicalTab, CommsTab, ConsentTab, EncountersTab, JourneyTab, MedicationsTab, NewTask, SurveysTab, TimelineTab } from "./PatientWorkspace"
 import TasksView from "./TasksView"
 import { Badge, btnCls, Card, cx, Empty, ErrorBox, errMsg, fmtDate, fmtDateTime, fullName, inputCls, Loading, pretty, Table, useAsync, firstSymptoms } from "./ui"
 
-type Tab = "overview" | "timeline" | "clinical" | "vitals" | "care_team" | "billing" | "encounters" | "medications" | "labs" | "appointments" | "journey" | "surveys" | "communications" | "tasks" | "documents" | "consent"
+type Tab = "overview" | "timeline" | "clinical" | "vitals" | "care_team" | "billing" | "encounters" | "medications" | "labs" | "appointments" | "journey" | "surveys" | "communications" | "tasks" | "notes" | "documents" | "consent"
 
 const TABS: Array<{ key: Tab; label: string; icon: string }> = [
   { key: "overview", label: "Overview", icon: "🏠" },
@@ -21,6 +22,7 @@ const TABS: Array<{ key: Tab; label: string; icon: string }> = [
   { key: "surveys", label: "Surveys", icon: "📝" },
   { key: "communications", label: "Communications", icon: "💬" },
   { key: "tasks", label: "Tasks", icon: "✅" },
+  { key: "notes", label: "Notes", icon: "🗒️" },
   { key: "billing", label: "Billing & Insurance", icon: "💳" },
   { key: "documents", label: "Documents", icon: "📄" },
   { key: "consent", label: "Consent & Audit", icon: "🔒" },
@@ -284,6 +286,200 @@ function VitalsTab({ d }: { d: Row }) {
   )
 }
 
+function NotesTab({ patientId }: { patientId: string }) {
+  const { data, error, loading, reload } = useAsync(() => p360.notes(patientId), [patientId])
+  const [text, setText] = useState("")
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState("")
+  const save = async () => {
+    if (!text.trim()) return
+    setBusy(true); setMsg("")
+    try { await p360.addNote(patientId, text); setText(""); reload() } catch (e) { setMsg(errMsg(e)) } finally { setBusy(false) }
+  }
+  return (
+    <div className="space-y-3">
+      <Card title="Add coordinator note">
+        <textarea aria-label="Coordinator note" className={cx(inputCls, "min-h-[84px] w-full")} maxLength={2000} value={text} onChange={(e) => setText(e.target.value)}
+          placeholder="Internal note for the care team — not visible to the patient and not sent to them." />
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-[11px] text-[#94A3B8]">{text.length}/2000 · Notes can't be edited or deleted once saved.</span>
+          <button className={btnCls.primary} disabled={busy || !text.trim()} onClick={save}>{busy ? "Saving…" : "Save note"}</button>
+        </div>
+        {msg && <p className="mt-2 text-[12px] text-[#B91C1C]">{msg}</p>}
+      </Card>
+      <Card title="Notes">
+        {error && <ErrorBox error={error} onRetry={reload} />}
+        {loading && !data ? <Loading /> : data?.notes?.length ? (
+          <ul className="space-y-2">{data.notes.map((n: Row) => (
+            <li key={n.id} className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+              <p className="whitespace-pre-wrap text-[12.5px] text-gray-900">{n.note}</p>
+              <p className="mt-1 text-[10.5px] text-[#94A3B8]">{n.author || "Unknown"} · {fmtDateTime(n.created_at)}</p>
+            </li>
+          ))}</ul>
+        ) : <Empty>No notes yet.</Empty>}
+      </Card>
+    </div>
+  )
+}
+
+/** Every symptom report the patient sent in, not just the latest. */
+function SymptomHistory({ patientId }: { patientId: string }) {
+  const { data, error, loading, reload } = useAsync(() => p360.symptomHistory(patientId), [patientId])
+  return (
+    <Card title="Symptom history (reported by the patient)">
+      {error && <ErrorBox error={error} onRetry={reload} />}
+      {loading && !data ? <Loading /> : data?.symptoms?.length ? (
+        <ul className="space-y-2">{data.symptoms.map((s: Row) => (
+          <li key={s.id} className="border-l-2 border-emerald-500 pl-3 text-[12.5px]"><span className="italic text-gray-900">"{s.symptoms}"</span><span className="text-[#94A3B8]"> · {pretty(s.channel)} · {fmtDateTime(s.created_at)}</span></li>
+        ))}</ul>
+      ) : <Empty>The patient hasn't reported any symptoms.</Empty>}
+    </Card>
+  )
+}
+
+const PRINT_CSS = `
+@page { size: A4; margin: 14mm }
+* { box-sizing: border-box }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11.5px; color: #111; margin: 0 }
+h1 { font-size: 19px; margin: 0 0 2px; color: #12285A }
+h2 { font-size: 13px; margin: 16px 0 5px; padding: 3px 6px; background: #E8F0FE; color: #12285A; border-left: 3px solid #1B4FD8; page-break-after: avoid }
+.sub { color: #555; margin: 0 0 4px }
+.head { border-bottom: 2px solid #1B4FD8; padding-bottom: 8px; margin-bottom: 4px }
+table { width: 100%; border-collapse: collapse; margin-bottom: 2px }
+th { text-align: left; background: #F1F5F9; font-weight: 700 }
+th, td { border: 1px solid #CBD5E1; padding: 3px 6px; vertical-align: top }
+tr { page-break-inside: avoid }
+td.k { width: 22%; background: #F8FAFC; font-weight: 600; color: #334155 }
+.alert { display: inline-block; margin: 0 6px 4px 0; padding: 2px 8px; border: 1px solid #FCA5A5; background: #FEF2F2; color: #991B1B; border-radius: 4px; font-weight: 600 }
+.note { margin: 0 0 6px; white-space: pre-wrap }
+.muted { color: #666; font-size: 10px }
+.foot { margin-top: 18px; padding-top: 6px; border-top: 1px solid #CBD5E1; color: #666; font-size: 10px }
+`
+
+/** The printable document: every section that has data, as tables. Rendered to a standalone HTML page, so the app layout can't affect it. */
+const LABEL = (k: string) => k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+const WHEN_KEY = /(_at|_date|_time|timestamp|^date|^time)$/i
+const cellText = (k: string, v: any): string => {
+  if (v === null || v === undefined || v === "") return ""
+  if (typeof v === "boolean") return v ? "Yes" : "No"
+  if (typeof v === "object") { const j = JSON.stringify(v); return j.length > 300 ? j.slice(0, 300) + "…" : j }
+  if (WHEN_KEY.test(k) && !Number.isNaN(Date.parse(String(v)))) return /\d{2}:\d{2}/.test(String(v)) ? fmtDateTime(String(v)) : fmtDate(String(v))
+  return String(v)
+}
+
+/** A module's records printed generically: every column that has at least one value, so no stored data is dropped. */
+function GenericTable({ rows }: { rows: Row[] }) {
+  const cols = Object.keys(Object.assign({}, ...rows)).filter((k) => rows.some((r) => cellText(k, r[k]) !== ""))
+  if (!cols.length) return null
+  return <table><thead><tr>{cols.map((c) => <th key={c}>{LABEL(c)}</th>)}</tr></thead><tbody>{rows.map((r, i) => <tr key={i}>{cols.map((c) => <td key={c}>{cellText(c, r[c]) || "—"}</td>)}</tr>)}</tbody></table>
+}
+
+function PrintSummary({ d, notes, symptoms, record }: { d: Row; notes: Row[]; symptoms: Row[]; record: Row | null }) {
+  const p = d.patient, h = d.clinical_history
+  const dash = (v: any) => (v === null || v === undefined || v === "" ? "—" : String(v))
+  const T = (head: string[], rows: any[][]) => (
+    <table><thead><tr>{head.map((x) => <th key={x}>{x}</th>)}</tr></thead><tbody>{rows.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j}>{c}</td>)}</tr>)}</tbody></table>
+  )
+  const S = (title: string, count: number, body: React.ReactNode) => (count > 0 ? <><h2>{title}</h2>{body}</> : null)
+  const allergy = p.allergies || h?.allergies
+  const admitted = d.admissions.some((a: Row) => !a.discharge_date)
+  const due = d.invoices.reduce((n: number, i: Row) => n + Number(i.due_amount || 0), 0)
+  const sym = firstSymptoms(d.whatsapp_symptoms?.symptoms, p.symptoms)
+  const bed = d.beds.find((b: Row) => !b.released_at)
+  const kv = (rows: Array<[string, any]>) => (
+    <table><tbody>{[0, 2, 4, 6].map((i) => rows.slice(i, i + 2)).filter((r) => r.length).map((r, i) => <tr key={i}>{r.map(([k, v]) => <Fragment key={k}><td className="k">{k}</td><td>{dash(v)}</td></Fragment>)}{r.length === 1 && <><td className="k" /><td /></>}</tr>)}</tbody></table>
+  )
+  const pending = d.checkpoints.filter((c: Row) => ["scheduled", "queued", "overdue"].includes(c.status))
+  const openTasks = d.tasks.filter((t: Row) => !["resolved", "cancelled"].includes(t.status))
+  const hist: Array<[string, any]> = h ? [["Allergies", h.allergies], ["Existing conditions", h.existing_diseases], ["Chronic conditions", h.chronic_conditions], ["Previous surgeries", h.previous_surgeries], ["Family history", h.family_history]] : []
+  const histRows = hist.filter(([, v]) => v)
+  const alerts = [allergy && `Allergies: ${allergy}`, admitted && `Currently admitted${bed ? ` — ${bed.ward || "Ward"} ${bed.bed_no || ""}` : ""}`, due > 0 && `Outstanding balance ${money(due)}`].filter(Boolean) as string[]
+
+  return (
+    <div>
+      <div className="head">
+        <h1>Patient Summary</h1>
+        <p className="sub"><b>{fullName(p)}</b> · {p.patient_id}</p>
+        <p className="muted">Printed {fmtDateTime(new Date().toISOString())} from Patient 360°. Read from every module that holds this patient's data; sections with no data are omitted.</p>
+      </div>
+
+      {kv([["Name", fullName(p)], ["Patient ID", p.patient_id], ["Age / Gender", `${dash(p.age)} yrs / ${dash(p.gender)}`], ["Mobile", p.phone], ["Blood group", p.blood_group], ["Registered", p.created_at ? fmtDate(p.created_at) : "—"], ["Treating doctor", d.appointments[0]?.doctor_name], ["Department", d.appointments[0]?.department]])}
+
+      {record && record.modules.length > 0 && <>
+        <h2>Modules visited — patient pathway</h2>
+        <p className="note">{record.modules.map((m: Row) => m.module).join("  →  ")}</p>
+        {T(["#", "Module", "Records", "Source data", "First seen", "Latest"], record.modules.map((m: Row, i: number) => [i + 1, m.module, m.records, (m.sources || []).join(", "), m.first ? fmtDateTime(m.first) : "—", m.last ? fmtDateTime(m.last) : "—"]))}
+      </>}
+      {!record && <p className="muted">Cross-module records could not be loaded; only the Patient 360 profile data is shown.</p>}
+
+      {alerts.length > 0 && <><h2>Alerts</h2><div>{alerts.map((a) => <span key={a} className="alert">{a}</span>)}</div></>}
+
+      {S("Reported symptoms", sym || symptoms.length ? 1 : 0, <>
+        {sym && <p className="note"><b>Current:</b> {sym}</p>}
+        {symptoms.length > 0 && T(["When", "Channel", "Symptoms reported"], symptoms.map((s) => [fmtDateTime(s.created_at), pretty(s.channel), s.symptoms]))}
+      </>)}
+
+      {S("Medical history", histRows.length, T(["Item", "Details"], histRows.map(([k, v]) => [k, v])))}
+      {S("Diagnoses", d.diagnoses.length, T(["Diagnosis", "Recorded"], d.diagnoses.map((x: Row) => [x.diagnosis_name, fmtDate(x.created_at)])))}
+      {S("Vitals", d.vitals.length, T(["When", "BP", "Pulse", "Temp", "SpO₂", "Glucose", "Weight"], d.vitals.slice(0, 12).map((v: Row) => [fmtDateTime(v.created_at), dash(v.bp), dash(v.pulse), dash(v.temperature), dash(v.spo2), dash(v.blood_glucose), dash(v.weight)])))}
+
+      {S("Admissions", d.admissions.length, T(["Admitted", "Discharged"], d.admissions.map((a: Row) => [fmtDateTime(a.admission_date), a.discharge_date ? fmtDate(a.discharge_date) : "Currently admitted"])))}
+      {S("OP / IP encounters", d.encounters.length, T(["Arrived", "Type", "Complaint", "Status"], d.encounters.map((e: Row) => [fmtDateTime(e.arrival_at), dash(e.encounter_type), dash(e.chief_complaint), pretty(e.status)])))}
+      {S("Emergency visits", d.er_visits.length, T(["Arrived", "Visit no", "Condition", "Doctor", "Status"], d.er_visits.map((v: Row) => [fmtDateTime(v.arrival_at), dash(v.visit_no), dash(v.condition_at_arrival), dash(v.assigned_doctor_name), pretty(v.status)])))}
+      {S("Surgeries", d.surgeries.length, T(["Procedure", "Surgeon", "Scheduled", "Status"], d.surgeries.map((x: Row) => [x.procedure_name, dash(x.surgeon_name), fmtDateTime(x.scheduled_start), pretty(x.status)])))}
+      {S("Bed allocations", d.beds.length, T(["Ward / bed", "Allocated", "Released"], d.beds.map((b: Row) => [`${b.ward || "—"} ${b.room_no || ""} ${b.bed_no || ""}`, fmtDate(b.allocated_at), b.released_at ? fmtDate(b.released_at) : "—"])))}
+
+      {S("Medications", d.medications.length, T(["Prescribed", "Medicines", "Doctor", "Status"], d.medications.map((m: Row) => [fmtDate(m.created_at), (m.medicines || []).map((x: Row) => [x.name, x.dosage, x.quantity ? `× ${x.quantity}` : ""].filter(Boolean).join(" ")).join("; ") || "—", dash(m.doctor_username), pretty(m.status)])))}
+      {S("Labs & imaging", d.investigations.length, T(["Test", "Ordered", "Ordered by", "Status"], d.investigations.map((x: Row) => [x.test_name, fmtDate(x.created_at), dash(x.doctor_name), `${labState(x)} (${pretty(x.order_status)})`])))}
+      {S("Appointments", d.appointments.length, T(["When", "Department", "Doctor", "Type", "Status"], d.appointments.map((a: Row) => [fmtDateTime(a.appointment_date), dash(a.department), dash(a.doctor_name), dash(a.visit_type), pretty(a.status)])))}
+
+      {S("Care journey", d.journeys.length, <>
+        {T(["Journey", "State", "Started"], d.journeys.map((j: Row) => [pretty(j.template_key), pretty(j.state), fmtDate(j.started_at)]))}
+        {pending.length > 0 && <><p className="muted" style={{ marginTop: 6 }}>Pending follow-up steps</p>{T(["Step", "Due", "Status"], pending.map((c: Row) => [c.label, fmtDate(c.due_at), pretty(c.status)]))}</>}
+      </>)}
+      {S("Open tasks", openTasks.length, T(["Task", "Priority", "Status", "Due"], openTasks.map((t: Row) => [dash(t.title), pretty(t.priority), pretty(t.status), t.due_at ? fmtDate(t.due_at) : "—"])))}
+
+      {S("Invoices", d.invoices.length, T(["Invoice", "Module", "Date", "Total", "Paid", "Due", "Status"], d.invoices.map((i: Row) => [i.invoice_no, pretty(i.module), fmtDate(i.created_at), money(i.total_amount), money(i.paid_amount), money(i.due_amount), pretty(i.payment_status)])))}
+      {S("Insurance claims", d.claims.length, T(["Insurer", "Claimed", "Approved", "Status"], d.claims.map((c: Row) => [dash(c.insurer_name), money(c.claim_amount), money(c.approved_amount), pretty(c.claim_status)])))}
+      {S("Documents", d.documents.length, T(["Type", "File", "Uploaded"], d.documents.map((x: Row) => [pretty(x.doc_type), dash(x.file_name), fmtDate(x.created_at)])))}
+      {S("Communication log", d.communications.length, T(["When", "Channel", "Kind", "Status"], d.communications.map((m: Row) => [fmtDateTime(m.created_at), String(m.channel || "").toUpperCase(), pretty(m.kind), pretty(m.status)])))}
+      {S("Coordinator notes", notes.length, notes.map((n) => <div key={n.id} style={{ pageBreakInside: "avoid" }}><p className="note">{n.note}</p><p className="muted">{dash(n.author)} · {fmtDateTime(n.created_at)}</p></div>))}
+
+      {record && record.sections.length > 0 && <h2 style={{ background: "#12285A", color: "#fff", borderLeft: "none" }}>Detailed module records</h2>}
+      {record?.sections.map((s: Row, i: number) => (
+        <section key={`${s.title}${i}`} style={{ marginTop: 8 }}>
+          <p style={{ fontWeight: 700, margin: "6px 0 3px" }}>{s.title} <span className="muted">· {s.module} · {s.rows.length} record{s.rows.length > 1 ? "s" : ""}</span></p>
+          <GenericTable rows={s.rows} />
+        </section>
+      ))}
+
+      <p className="foot">Confidential patient information. Data reflects the source modules at the time of printing and may change.</p>
+    </div>
+  )
+}
+
+/** Print in a hidden iframe holding only the summary, so the app's scroll containers and sidebar never affect the output. */
+async function printSummary(d: Row) {
+  const id = d.patient.patient_id
+  const [notes, symptoms, record] = await Promise.all([
+    p360.notes(id).then((r: Row) => (r.notes || []) as Row[]).catch(() => [] as Row[]),
+    p360.symptomHistory(id).then((r: Row) => (r.symptoms || []) as Row[]).catch(() => [] as Row[]),
+    p360.fullRecord(id).then((r: Row) => r as Row).catch(() => null),
+  ])
+  const html = renderToStaticMarkup(<PrintSummary d={d} notes={notes} symptoms={symptoms} record={record} />)
+  const frame = document.createElement("iframe")
+  frame.setAttribute("aria-hidden", "true")
+  frame.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0"
+  document.body.appendChild(frame)
+  const doc = frame.contentDocument!
+  doc.open()
+  doc.write(`<!doctype html><html><head><meta charset="utf-8"><title>Patient summary - ${fullName(d.patient).replace(/[<>&]/g, "")}</title><style>${PRINT_CSS}</style></head><body>${html}</body></html>`)
+  doc.close()
+  frame.contentWindow!.addEventListener("afterprint", () => frame.remove())
+  setTimeout(() => { frame.contentWindow!.focus(); frame.contentWindow!.print() }, 150)
+}
+
+
 /** Everyone who has treated this patient, derived from records already loaded (no new data source). */
 function CareTeam({ d }: { d: Row }) {
   const team = new Map<string, { name: string; dept: Set<string>; roles: Set<string>; n: number; last: string }>()
@@ -410,6 +606,7 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
   const [tab, setTab] = useState<Tab>("overview")
   const [showTask, setShowTask] = useState(false)
   const [copied, setCopied] = useState("")
+  const [printing, setPrinting] = useState(false)
   /** Those modules take no patient input, so hand the ID over via the clipboard to paste into their search. */
   const openFor = async (module: string) => {
     try { await navigator.clipboard.writeText(patientId); setCopied(patientId) } catch { /* clipboard blocked: still navigate */ }
@@ -506,6 +703,7 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
           <div className="flex flex-wrap gap-2">
             <button className={btnCls.ghost} onClick={() => window.open(patientPageUrl(p.patient_id), "_blank", "noopener")}>✎ Open Full Record</button>
             <button className={btnCls.ghost} onClick={() => setShowTask(true)}>+ Task</button>
+            <button className={btnCls.ghost} disabled={printing} onClick={async () => { setPrinting(true); try { await printSummary(d) } finally { setPrinting(false) } }}>{printing ? "Preparing…" : "🖨 Print summary"}</button>
             <button className={btnCls.ghost} onClick={reload}>⟳ Refresh</button>
             <button className={btnCls.ghost} onClick={onClose}>✕ Close</button>
           </div>
@@ -535,8 +733,9 @@ function Profile({ patientId, onClose, navigate }: { patientId: string; onClose:
       {tab === "clinical" && <ClinicalTab d={d} />}
       {tab === "vitals" && <VitalsTab d={d} />}
       {tab === "care_team" && <CareTeam d={d} />}
+      {tab === "notes" && <NotesTab patientId={p.patient_id} />}
       {tab === "billing" && <BillingTab d={d} />}
-      {tab === "encounters" && <><EncountersTab d={d} /><MoreVisits d={d} /></>}
+      {tab === "encounters" && <><EncountersTab d={d} /><div className="mt-3"><SymptomHistory patientId={p.patient_id} /></div><MoreVisits d={d} /></>}
       {tab === "medications" && <MedicationsTab d={d} />}
       {tab === "labs" && <Labs d={d} />}
       {tab === "appointments" && <Appointments d={d} />}
